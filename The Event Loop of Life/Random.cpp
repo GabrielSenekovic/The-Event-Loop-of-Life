@@ -15,3 +15,19 @@ uint32_t Random::myRand()
 	uint32_t m2 = (tmp >> 32) ^ tmp;
 	return m2;
 }
+
+Pixel Random::GetSimilarColor(Pixel color, int modulus)
+{
+	int biggestValue = std::max({ color.r, color.g, color.b });
+	int redMod = biggestValue == color.r ? -((int)myRand() % modulus) : myRand() % modulus;
+	int greenMod = biggestValue == color.g ? -((int)myRand() % modulus) : myRand() % modulus;
+	int blueMod = biggestValue == color.b ? -((int)myRand() % modulus) : myRand() % modulus;
+	Pixel value =
+	{
+		(uint8_t)(color.r + redMod),
+		(uint8_t)(color.g + greenMod),
+		(uint8_t)(color.b + blueMod),
+		color.a
+	};
+	return value;
+}

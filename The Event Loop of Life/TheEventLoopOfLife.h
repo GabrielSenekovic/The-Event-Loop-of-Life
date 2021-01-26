@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "Random.h"
 #include "HUDElement.h"
+#include "Grid.h"
 
 using namespace olc;
 
@@ -26,18 +27,20 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 	float timer = 0;
 	float timeSpeed = 2;
 
-	IntVector2 grid = { 20, 20 };
-	std::vector<Pixel> tileColors;
-	std::vector<int> tileTraversibility; //I like to make it a bit more intricate
-	std::vector<std::array<Entity*, 3>> tileContent;
+	Grid grid;
+
 	Sheep* sheepbitch;
 
 	olc::Decal* tile;
 	olc::Decal* rock;
 	olc::Decal* sheep;
+	olc::Decal* sheep_eating;
 	olc::Decal* wolf;
 	olc::Decal* grass;
 	olc::Decal* grass_growing;
+	olc::Decal* wander; //A question mark
+	olc::Decal* pursue; //An exclamation point
+	olc::Decal* breed; //A heart
 
 	HUDElement frameRate;
 	HUDElement amountOfTurns;
@@ -46,6 +49,10 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 	HUDElement sheep_target_x;
 	HUDElement sheep_target_y;
 	HUDElement sheep_HP;
+
+	HUDElement amountOfGrass;
+	HUDElement amountOfSheep;
+	HUDElement amountOfWolves;
 
 	std::vector<Entity*> entities;
 

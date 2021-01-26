@@ -149,6 +149,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Grass.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="HUDElement.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Numbers.cpp" />
@@ -157,6 +159,7 @@
     <ClCompile Include="Sheep.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="TheEventLoopOfLife.cpp" />
+    <ClCompile Include="Wolf.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

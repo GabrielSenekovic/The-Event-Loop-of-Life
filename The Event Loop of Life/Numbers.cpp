@@ -10,12 +10,10 @@ Digit::Digit(const int value, const int x, const int y, std::array<Decal*, 10>& 
 	m_value = value;
 	m_trans = vf2d((float)x, (float)y);
 	m_sprite = (*digits)[m_value];
-	//m_sprite.SetDestination((int)m_trans.m_position.x, (int)m_trans.m_position.y, 8, 8);
 }
 void Digit::Update()
 {
 	m_sprite = (*digits)[m_value];
-	//m_sprite.SetDestination((int)m_trans.m_position.x, (int)m_trans.m_position.y, 8, 8);
 }
 void Digit::Render(TheEventLoopOfLife& game)
 {

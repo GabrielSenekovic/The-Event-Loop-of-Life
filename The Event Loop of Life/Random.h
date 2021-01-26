@@ -1,5 +1,7 @@
 #pragma once
 #include <random>
+#include "olcPixelGameEngine.h"
+using namespace olc;
 
 class Random
 {
@@ -9,4 +11,5 @@ public:
 
 	Random();
 	uint32_t myRand();
+	Pixel GetSimilarColor(Pixel color, int modulus);
 };

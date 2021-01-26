@@ -9,7 +9,7 @@ int main()
 	int client_width = (rect.right - rect.left);
 	int client_height = (rect.bottom - rect.top);
 
-	TheEventLoopOfLife program = (IntVector2(client_width, client_height));
+	TheEventLoopOfLife program = (IntVector2(client_width / 2, client_height / 2));
 	if (program.Construct((int32_t)program.dim.x, (int32_t)program.dim.y, 2, 2, true))
 	{
 		program.Start();
