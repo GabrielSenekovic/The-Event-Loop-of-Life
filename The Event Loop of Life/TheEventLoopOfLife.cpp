@@ -40,20 +40,14 @@ bool TheEventLoopOfLife::OnUserCreate()
 
 	frameRate = HUDElement(Word("FRAMERATE", 10, 10), Number(00000, 10 + 8 * 10, 10, 1, 5, digits));
 	amountOfTurns = HUDElement(Word("TURNS", 10, 20), Number(00000, 10 + 8 * 10, 20, 1, 5, digits));
-	sheep_x = HUDElement(Word("X", 10, 30), Number(00000, 10 + 8 * 10, 30, 1, 5, digits));
-	sheep_y = HUDElement(Word("Y", 10 + 8 * 20, 30), Number(00000, 10 + 8 * 30, 30, 1, 5, digits));
-	sheep_target_x = HUDElement(Word("TARGETX", 10, 40), Number(00000, 10 + 8 * 10, 40, 1, 5, digits));
-	sheep_target_y = HUDElement(Word("TARGETY", 10 + 8 * 20, 40), Number(00000, 10 + 8 * 30, 40, 1, 5, digits));
-	sheep_HP = HUDElement(Word("HP", 10, 50), Number(00000, 10 + 8 * 10, 50, 1, 5, digits));
 	amountOfGrass = HUDElement(Word("GRASS", 10, 100), Number(0000, 10 + 8 * 10, 100, 1, 4, digits));
 	amountOfSheep = HUDElement(Word("SHEEP", 10, 110), Number(0000, 10 + 8 * 10, 110, 1, 4, digits));
 	amountOfWolves = HUDElement(Word("WOLVES", 10, 120), Number(0000, 10 + 8 * 10, 120, 1, 4, digits));
 
-	for (size_t i = 0; i < 1; i++)
+	for (size_t i = 0; i < 10; i++)
 	{
 		Sheep* temp_sheep = new Sheep({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, {sheep, sheep_eating, wander, pursue, breed});
 		entities.push_back(temp_sheep);
-		sheepbitch = temp_sheep;
 		grid.PlaceEntityOnGrid(temp_sheep);
 	}
 
@@ -84,7 +78,7 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 		if (timer == 0)
 		{
 			entities[i]->Sense(grid.tileContent, grid.grid);
-			entities[i]->Decide(r);
+			entities[i]->Decide(r, grid.grid);
 		}
 		entities[i]->Act(r, grid.grid, fElapsedTime, timeSpeed, grid.tileContent, entities);
 		if (entities[i]->dead)
@@ -97,11 +91,6 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 	
 	frameRate.number.Reset(); 
 	frameRate.number.Add(fElapsedTime * 1000000);
-	sheep_x.number.Reset(); sheep_x.number.Add(sheepbitch->position.x);
-	sheep_y.number.Reset(); sheep_y.number.Add(sheepbitch->position.y);
-	sheep_target_x.number.Reset(); sheep_target_x.number.Add(sheepbitch->targetPosition.x);
-	sheep_target_y.number.Reset(); sheep_target_y.number.Add(sheepbitch->targetPosition.y);
-	//sheep_HP.number.Reset(); sheep_HP.number.Add(sheepbitch->health.x);
 	amountOfGrass.number.Reset(); amountOfGrass.number.Add(n_amountOfGrass);
 	amountOfSheep.number.Reset(); amountOfSheep.number.Add(n_amountOfSheep);
 	amountOfWolves.number.Reset(); amountOfWolves.number.Add(n_amountOfWolves);
@@ -155,7 +144,7 @@ void TheEventLoopOfLife::OnUserDraw()
 	}
 	for (size_t i = 0; i < entities.size(); i++)
 	{
-		Vector2 position = { tile->Width() * entities[i]->walkingPosition.x + dim.x / 2 - centering.x, tile->Height() * entities[i]->walkingPosition.y + dim.y / 2 - centering.y };
+		Vector2 position = { tile->Width() * entities[i]->GetPosition().x + dim.x / 2 - centering.x, tile->Height() * entities[i]->GetPosition().y + dim.y / 2 - centering.y };
 		if (entities[i]->entityType != Entity::EntityType::GRASS)
 		{
 			entities[i]->Render(*this, position);
@@ -163,11 +152,6 @@ void TheEventLoopOfLife::OnUserDraw()
 	}
 	frameRate.Render(*this);
 	amountOfTurns.Render(*this);
-	sheep_x.Render(*this);
-	sheep_y.Render(*this);
-	sheep_target_x.Render(*this);
-	sheep_target_y.Render(*this);
-	sheep_HP.Render(*this);
 	amountOfGrass.Render(*this);
 	amountOfSheep.Render(*this);
 	amountOfWolves.Render(*this);

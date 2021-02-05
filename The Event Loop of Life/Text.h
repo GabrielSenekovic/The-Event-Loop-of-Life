@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TEXT_H
+#define TEXT_H
+
 #include "olcPixelGameEngine.h"
 using namespace olc;
 
@@ -28,3 +30,5 @@ struct Word
 	void Render(TheEventLoopOfLife& game);
 	void Reset();
 };
+
+#endif

@@ -1,9 +1,13 @@
-#pragma once
+#ifndef THEEVENTLOOPOFLIFE_H
+#define THEEVENTLOOPOFLIFE_H
+
 #include "olcPixelGameEngine.h"
-#include "Entity.h"
 #include "Random.h"
 #include "HUDElement.h"
 #include "Grid.h"
+#include "Sheep.h"
+#include "Wolf.h"
+#include "Grass.h"
 
 using namespace olc;
 
@@ -29,7 +33,6 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 
 	Grid grid;
 
-	Sheep* sheepbitch;
 
 	olc::Decal* tile;
 	olc::Decal* rock;
@@ -44,11 +47,6 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 
 	HUDElement frameRate;
 	HUDElement amountOfTurns;
-	HUDElement sheep_x;
-	HUDElement sheep_y;
-	HUDElement sheep_target_x;
-	HUDElement sheep_target_y;
-	HUDElement sheep_HP;
 
 	HUDElement amountOfGrass;
 	HUDElement amountOfSheep;
@@ -67,9 +65,9 @@ public:
 	bool OnUserUpdate(float fElepsedTime)override;
 	void OnUserDraw();
 
-	Pixel GetSimilarColor(Pixel color, int modulus);
-
 	void Quit();
 
 	IntVector2 dim; //Dimensions of the screen
 };
+
+#endif

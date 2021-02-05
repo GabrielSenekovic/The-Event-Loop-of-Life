@@ -1,7 +1,7 @@
-#include "Entity.h"
+#include "Wolf.h"
 #include "TheEventLoopOfLife.h"
 
-Wolf::Wolf(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in) : Entity(position_in, health_in, sprites_in),
+Wolf::Wolf(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in) : Animal(position_in, health_in, sprites_in),
 	renderState(EntityState::IDLE)
 {
 	entityType = EntityType::WOLF;
@@ -14,38 +14,40 @@ void Wolf::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVecto
 		position = destination;
 		//destination = Vector2(-1, -1);
 	}
-	//Check if there are wolves too close. If there are, take several more wolves in a range into account.
-	int32_t index = position.x + dim.x * position.y;
-	int* constraints = getValidConstraints(index, dim);
-	targets.clear();
-	/*for (int y = constraints[3]; y < constraints[5]; y++)
+	if (target == nullptr)
 	{
-		for (int x = constraints[2]; x < constraints[4]; x++)
+		int32_t index = position.x + dim.x * position.y;
+		int* constraints = getValidConstraints(index, 2, dim);
+		targets.clear();
+		for (int y = constraints[3]; y < constraints[5]; y++)
 		{
-			//Look for grass and wolves
-			if ((grid[x + dim.x * y][0] != nullptr && grid[x + dim.x * y][0]->entityType == EntityType::SHEEP))
+			for (int x = constraints[2]; x < constraints[4]; x++)
 			{
-				targets.push_back(*grid[x + dim.x * y][0]);
-			}
-			if ((grid[x + dim.x * y][1] != nullptr && grid[x + dim.x * y][1]->entityType == EntityType::SHEEP))
-			{
-				targets.push_back(*grid[x + dim.x * y][1]);
+				//Look for sheep
+				if ((grid[x + dim.x * y][0] != nullptr && grid[x + dim.x * y][0]->entityType == EntityType::SHEEP))
+				{
+					targets.push_back(grid[x + dim.x * y][0]);
+				}
+				if ((grid[x + dim.x * y][1] != nullptr && grid[x + dim.x * y][1]->entityType == EntityType::SHEEP))
+				{
+					targets.push_back(grid[x + dim.x * y][1]);
+				}
 			}
 		}
-	}*/
-	delete constraints;
+		delete constraints;
+	}
 }
 
-void Wolf::Decide(Random& r)
+void Wolf::Decide(Random& r, const IntVector2& dim)
 {
 	if (health.x <= 0)
 	{
-		state = EntityState::DEATH;
-		renderState = EntityState::DEATH;
-		return;
+		//state = EntityState::DEATH;
+		//renderState = EntityState::DEATH;
+		//return;
 	}
 	//Breed if not being chased by wolves
-	if (position == destination && state == EntityState::PURSUE && health.x > 0)
+	if (target != nullptr && position == target->position)
 	{
 		state = EntityState::EAT;
 		renderState = EntityState::EAT;
@@ -59,7 +61,7 @@ void Wolf::Decide(Random& r)
 	{
 		state = EntityState::PURSUE;
 		renderState = EntityState::PURSUE;
-		targetPosition = targets[r.myRand() % targets.size()].position;
+		target = targets[r.myRand() % targets.size()];
 	}
 	else
 	{
@@ -74,49 +76,46 @@ void Wolf::Act(Random& r, const IntVector2& dim, const float& deltaTime, const f
 	{
 	case EntityState::BREED:
 	{
-		Vector2 breedingPlace = GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
+		Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
 		if (breedingPlace == Vector2{ -1,-1 }) { return; }
 		else
 		{
 			health.x -= (health.y * 0.4f);
 			Wolf* temp = new Wolf(position, { (health.y * 0.4f), health.y }, sprites);
-			/*if (tileContent[breedingPlace.x + dim.x * breedingPlace.y][0] == nullptr)
-			{
-				tileContent[breedingPlace.x + dim.x * breedingPlace.y][0] = temp;
-				tileContent[breedingPlace.x + dim.x * breedingPlace.y][0]->spaceOccupying = 0;
-			}
-			else
-			{
-				tileContent[breedingPlace.x + dim.x * breedingPlace.y][1] = temp;
-				tileContent[breedingPlace.x + dim.x * breedingPlace.y][1]->spaceOccupying = 1;
-			}*/
 			entities.push_back(temp);
-			//temp->destination = breedingPlace;
 			state = EntityState::IDLE;
 		}
 	}break;
 	case EntityState::EAT:
-		if (tileContent[position.x + dim.x * position.y][2] != nullptr) //Because sometimes the sheep might try to eat grass that another sheep just ate
+	{
+		int placementOfPrey = spaceOccupying == 0 ? 1 : 0;
+		if (tileContent[position.x + dim.x * position.y][placementOfPrey] != nullptr)
 		{
 			health.x += 5;
-			tileContent[position.x + dim.x * position.y][2]->health.x = 0;
+			tileContent[position.x + dim.x * position.y][placementOfPrey]->health.x = 0;
 		}
 		state = EntityState::IDLE;
-		break;
-	case EntityState::EVADE:
-		//Go in a safe direction
+		target = nullptr;
+	}
 		break;
 	case EntityState::PURSUE:
 	{
 		if (destination == Vector2{ -1, -1 })
 		{
-			destination = targetPosition;
+			destination = target->position;
 			if (destination == Vector2{ -1,-1 }) { return; }
 			else
 			{
 				tileContent[position.x + dim.x * position.y][spaceOccupying] = nullptr;
 				if (tileContent[destination.x + dim.x * destination.y][0] == nullptr) { tileContent[destination.x + dim.x * destination.y][0] = this; spaceOccupying = 0; }
-				else { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
+				else if (tileContent[destination.x + dim.x * destination.y][1] == nullptr) { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
+				else
+				{
+					tileContent[position.x + dim.x * position.y][spaceOccupying] = this;
+					destination = Vector2(-1, -1);
+					state = EntityState::IDLE;
+					return;
+				}
 			}
 		}
 		Move(deltaTime, timeSpeed);
@@ -126,7 +125,7 @@ void Wolf::Act(Random& r, const IntVector2& dim, const float& deltaTime, const f
 	{
 		if (destination == Vector2{ -1, -1 })
 		{
-			destination = GetRandomAdjacentPosition(r, dim, tileContent, EntityType::WOLF);
+			destination = GetRandomAdjacentPosition(r, dim, 2, tileContent, EntityType::WOLF);
 			if (destination == Vector2{ -1,-1 }) { return; }
 			else
 			{
@@ -166,7 +165,7 @@ void Wolf::Render(TheEventLoopOfLife& game, Vector2 renderPosition)
 		case EntityState::PURSUE:
 		{
 			game.DrawDecal(renderPosition, sprites[0], { 1,1 }, olc::WHITE);
-			game.DrawDecal(emotePosition, sprites[2], { 1,1 }, olc::WHITE);
+			game.DrawDecal(emotePosition, sprites[2], { 1,1 }, olc::RED);
 			break;
 		}
 		case EntityState::EAT:

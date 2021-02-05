@@ -1,4 +1,4 @@
-#include "Entity.h"
+#include "Grass.h"
 
 Grass::Grass() :Entity({ -1,-1 }, { 0,0 }, {})
 {
@@ -38,7 +38,7 @@ void Grass::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVect
 	}
 }
 
-void Grass::Decide(Random& r)
+void Grass::Decide(Random& r, const IntVector2& dim)
 {
 	//Should I spread to an adjacent square, or should I grow?
 	if (health.x <= 0)

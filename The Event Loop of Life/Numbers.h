@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUMBERS_H
+#define NUMBERS_H
 
 #include "olcPixelGameEngine.h"
 using namespace olc;
@@ -44,3 +45,5 @@ struct Number
 	void Reset();
 	void Render(TheEventLoopOfLife& game);
 };
+
+#endif

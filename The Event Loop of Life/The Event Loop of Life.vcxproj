@@ -138,16 +138,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animal.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="Grass.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="HUDElement.h" />
     <ClInclude Include="Numbers.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="Sheep.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="TheEventLoopOfLife.h" />
+    <ClInclude Include="Wolf.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Animal.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Grass.cpp" />
     <ClCompile Include="Grid.cpp" />

@@ -1,7 +1,7 @@
 #include "Entity.h"
 #include "TheEventLoopOfLife.h"
 
-Sheep::Sheep(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in) : Entity(position_in, health_in, sprites_in),
+Sheep::Sheep(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in) : Animal(position_in, health_in, sprites_in),
 	renderState(EntityState::IDLE)
 {
 	entityType = EntityType::SHEEP;
@@ -29,9 +29,26 @@ void Sheep::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVect
 		}
 	}
 	delete constraints;
+	constraints = getValidConstraints(index, 2, dim);
+	threats.clear();
+	for (int y = constraints[3]; y < constraints[5]; y++)
+	{
+		for (int x = constraints[2]; x < constraints[4]; x++)
+		{
+			if ((grid[x + dim.x * y][0] != nullptr && grid[x + dim.x * y][0]->entityType == EntityType::WOLF))
+			{
+				threats.push_back(grid[x + dim.x * y][0]);
+			}
+			if ((grid[x + dim.x * y][1] != nullptr && grid[x + dim.x * y][1]->entityType == EntityType::WOLF))
+			{
+				threats.push_back(grid[x + dim.x * y][1]);
+			}
+		}
+	}
+	delete constraints;
 }
 
-void Sheep::Decide(Random& r)
+void Sheep::Decide(Random& r, const IntVector2& dim)
 {
 	if (health.x <= 0) 
 	{ 
@@ -39,17 +56,39 @@ void Sheep::Decide(Random& r)
 		renderState = EntityState::DEATH;
 		return; 
 	}
-	//Breed if not being chased by wolves
-	if (position == destination && state == EntityState::PURSUE && health.x > 0)
+	if (threats.size() > 0)
+	{
+		state = EntityState::EVADE;
+		renderState = EntityState::EVADE;
+		Vector2 averageDirection;
+		for (int i = 0; i < threats.size(); i++)
+		{
+			averageDirection += position - threats[i]->position;
+		}
+		averageDirection /= threats.size();
+		//averageDirection *= -1; //This only gives us the direction to move in, not the position to move to
+		if (averageDirection.mag() == 0)
+		{
+			state = EntityState::IDLE;
+			return;
+		}
+		averageDirection = averageDirection.norm();
+		averageDirection = Vector2(averageDirection.x < 0 ? floor(averageDirection.x) : ceil(averageDirection.x), 
+								   averageDirection.y < 0 ? floor(averageDirection.y) : ceil(averageDirection.y));
+		targetPosition = position + averageDirection;
+		targetPosition = Vector2(targetPosition.x < 0 ? 0 : targetPosition.x >= dim.x ? dim.x -1 : targetPosition.x,
+								 targetPosition.y < 0 ? 0 : targetPosition.y >= dim.x ? dim.y -1: targetPosition.y);
+	}
+	else if (position == destination && state == EntityState::PURSUE)
 	{
 		state = EntityState::EAT;
 		renderState = EntityState::EAT;
 	}
-	else if (health.x > health.y * 0.75f) //If Sheep has more than 75% of health
+	/*else if (health.x > health.y * 0.75f) //If Sheep has more than 75% of health
 	{
 		state = EntityState::BREED;
 		renderState = EntityState::BREED;
-	}
+	}*/
 	else if (targets.size() > 0 && health.x < health.y)
 	{
 		state = EntityState::PURSUE;
@@ -69,24 +108,13 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 	{
 		case EntityState::BREED:
 		{
-			Vector2 breedingPlace = GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
+			Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
 			if (breedingPlace == Vector2{ -1,-1 }) { return; }
 			else
 			{
-				health.x -= (health.y * 0.4f);
-				Sheep* temp = new Sheep(position, { (health.y * 0.4f), health.y }, sprites);
-				/*if (tileContent[breedingPlace.x + dim.x * breedingPlace.y][0] == nullptr)
-				{
-					tileContent[breedingPlace.x + dim.x * breedingPlace.y][0] = temp; 
-					tileContent[breedingPlace.x + dim.x * breedingPlace.y][0]->spaceOccupying = 0;
-				}
-				else 
-				{ 
-					tileContent[breedingPlace.x + dim.x * breedingPlace.y][1] = temp; 
-					tileContent[breedingPlace.x + dim.x * breedingPlace.y][1]->spaceOccupying = 1; 
-				}*/
+				health.x -= (health.y * 0.5f);
+				Sheep* temp = new Sheep(position, { (health.y * 0.3f), health.y }, sprites);
 				entities.push_back(temp);
-				//temp->destination = breedingPlace;
 				state = EntityState::IDLE;
 			}
 		}break;
@@ -99,8 +127,6 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 			state = EntityState::IDLE;
 			break;
 		case EntityState::EVADE:
-			//Go in a safe direction
-			break;
 		case EntityState::PURSUE:
 		{
 			if (destination == Vector2{ -1, -1 })
@@ -111,7 +137,14 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 				{
 					tileContent[position.x + dim.x * position.y][spaceOccupying] = nullptr;
 					if (tileContent[destination.x + dim.x * destination.y][0] == nullptr) { tileContent[destination.x + dim.x * destination.y][0] = this; spaceOccupying = 0; }
-					else { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
+					else if (tileContent[destination.x + dim.x * destination.y][1] == nullptr) { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
+					else
+					{
+						tileContent[position.x + dim.x * position.y][spaceOccupying] = this;
+						destination = Vector2(-1, -1);
+						state = EntityState::IDLE;
+						return;
+					}
 				}
 			}
 			Move(deltaTime, timeSpeed);
@@ -121,7 +154,7 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 		{
 			if (destination == Vector2{ -1, -1 })
 			{
-				destination = GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
+				destination = Entity::GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
 				if (destination == Vector2{ -1,-1 }) { return; }
 				else
 				{
@@ -143,7 +176,7 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 		}
 	default: break;
 	}
-	health.x -= 1 / (timeSpeed / deltaTime);
+	//health.x -= 1 / (timeSpeed / deltaTime);
 }
 
 void Sheep::Render(TheEventLoopOfLife& game, Vector2 renderPosition)
@@ -161,7 +194,7 @@ void Sheep::Render(TheEventLoopOfLife& game, Vector2 renderPosition)
 		case EntityState::PURSUE:
 		{
 			game.DrawDecal(renderPosition, sprites[0], { 1,1 }, olc::WHITE);
-			game.DrawDecal(emotePosition, sprites[3], { 1,1 }, olc::WHITE);
+			game.DrawDecal(emotePosition, sprites[3], { 1,1 }, olc::RED);
 			break;
 		}
 		case EntityState::EAT:
@@ -178,6 +211,12 @@ void Sheep::Render(TheEventLoopOfLife& game, Vector2 renderPosition)
 		case EntityState::DEATH:
 		{
 			game.DrawDecal(renderPosition, sprites[0], { 1,1 }, olc::DARK_GREY);
+			break;
+		}
+		case EntityState::EVADE:
+		{
+			game.DrawDecal(renderPosition, sprites[0], { 1,1 }, olc::WHITE);
+			game.DrawDecal(emotePosition, sprites[3], { 1,1 }, olc::YELLOW);
 			break;
 		}
 	}
