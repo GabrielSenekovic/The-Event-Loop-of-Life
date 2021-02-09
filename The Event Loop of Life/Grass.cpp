@@ -23,7 +23,7 @@ Grass::Grass(const Vector2& position_in, const Vector2& health_in, const std::ve
 	spaceOccupying = 2;
 }
 
-void Grass::Sense(const Grid& grid)
+void Grass::Sense(const Grid& grid, const EntityManager& entityManager)
 {
 	//Am I being eaten or trampled?
 	isBeingTrampled = (grid.tileContent[position.x + grid.grid.x * position.y][0] != nullptr || grid.tileContent[position.x + grid.grid.x * position.y][1] != nullptr);

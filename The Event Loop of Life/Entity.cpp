@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include "TheEventLoopOfLife.h"
 #include "Grid.h"
+#include "EntityManager.h"
 
 Entity::Entity(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in) :
 	position(position_in), health(health_in),
@@ -89,7 +90,7 @@ Vector2 Entity::GetRandomAdjacentPosition(Random& r, const IntVector2& dim, cons
 }
 
 
-void Entity::Sense(const Grid& grid)
+void Entity::Sense(const Grid& grid, const EntityManager& entityManager)
 {
 }
 

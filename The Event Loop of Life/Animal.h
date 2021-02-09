@@ -14,6 +14,7 @@ public:
 	Vector2 GetRandomAdjacentPosition(Random& r, const IntVector2& dim, const int& range, const std::vector<std::array<Entity*, 3>>& tileContent, const EntityType& type);
 
 	void Move(const float& deltaTime, const float& timeSpeed);
+	bool TryPursue(Vector2& destination, const Vector2& direction, Grid& grid);
 	void Wander(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed);
 	void Die();
 

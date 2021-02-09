@@ -8,6 +8,7 @@
 #include "Sheep.h"
 #include "Wolf.h"
 #include "Grass.h"
+#include "EntityManager.h"
 
 using namespace olc;
 
@@ -33,7 +34,6 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 
 	Grid grid;
 
-
 	olc::Decal* tile;
 	olc::Decal* rock;
 	olc::Decal* sheep;
@@ -52,7 +52,7 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 	HUDElement amountOfSheep;
 	HUDElement amountOfWolves;
 
-	std::vector<Entity*> entities;
+	EntityManager entityManager;
 
 	std::array<Decal*, 10> digits;
 

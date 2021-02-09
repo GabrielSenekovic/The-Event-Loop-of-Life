@@ -28,7 +28,7 @@ bool TheEventLoopOfLife::OnUserCreate()
 			temp = { (float)(r.myRand() % grid.grid.x) ,(float)(r.myRand() % grid.grid.y) };
 		}
 		Grass* temp_grass = new Grass(temp, { (r.myRand() % 5) + 2.0f, 6.0f }, {grass, grass_growing});
-		entities.push_back(temp_grass);
+		entityManager.Add(temp_grass);
 		grid.tileContent[temp.x + grid.grid.x * temp.y][2] = temp_grass;
 	}
 	for (unsigned int i = 0; i < 10; i++)
@@ -47,10 +47,10 @@ bool TheEventLoopOfLife::OnUserCreate()
 	for (size_t i = 0; i < 10; i++)
 	{
 		Sheep* temp_sheep = new Sheep({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, {sheep, sheep_eating, wander, pursue, breed});
-		entities.push_back(temp_sheep);
+		entityManager.Add(temp_sheep);
 		grid.PlaceEntityOnGrid(temp_sheep);
 		Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, { wolf, wander, pursue, breed });
-		entities.push_back(temp_wolf);
+		entityManager.Add(temp_wolf);
 		grid.PlaceEntityOnGrid(temp_wolf);
 	}
 
@@ -68,22 +68,23 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 	int n_amountOfSheep = 0;
 	int n_amountOfWolves = 0;
 
-	for (int i = 0; i < entities.size(); i++)
+	for (int i = 0; i < entityManager.Size(); i++)
 	{
-		if (entities[i]->entityType == Entity::EntityType::GRASS) { n_amountOfGrass++; }
-		if (entities[i]->entityType == Entity::EntityType::SHEEP) { n_amountOfSheep++; }
-		if (entities[i]->entityType == Entity::EntityType::WOLF) { n_amountOfWolves++; }
+		if (entityManager.GetEntity(i)->entityType == Entity::EntityType::GRASS) { n_amountOfGrass++; }
+		if (entityManager.GetEntity(i)->entityType == Entity::EntityType::SHEEP) { n_amountOfSheep++; }
+		if (entityManager.GetEntity(i)->entityType == Entity::EntityType::WOLF) { n_amountOfWolves++; }
 
 		if (timer == 0)
 		{
-			entities[i]->Sense(grid);
-			entities[i]->Decide(r, grid.grid);
+			entityManager.GetEntity(i)->Sense(grid, entityManager);
+			entityManager.GetEntity(i)->Decide(r, grid.grid);
 		}
-		entities[i]->Act(r, grid, fElapsedTime, timeSpeed, entities);
-		if (entities[i]->dead)
+		entityManager.GetEntity(i)->Act(r, grid, fElapsedTime, timeSpeed, entityManager.entities);
+		if (entityManager.GetEntity(i)->dead)
 		{
-			grid.tileContent[entities[i]->position.x + grid.grid.x * entities[i]->position.y][entities[i]->spaceOccupying] = nullptr;
-			entities.erase(entities.begin() + i);
+			grid.tileContent[entityManager.GetEntity(i)->position.x + grid.grid.x * entityManager.GetEntity(i)->position.y][entityManager.GetEntity(i)->spaceOccupying] = nullptr;
+			DEL(entityManager.entities[i]);
+			entityManager.entities.erase(entityManager.entities.begin() + i);
 			i--;
 		}
 	}
@@ -115,17 +116,6 @@ void TheEventLoopOfLife::OnUserDraw()
 				grid.tileContent[i][1] != nullptr ? Pixel(0, 0, 255) :
 				color;
 
-		/*if (sheepbitch->targets.size() > 0)
-		{
-			for (int j = 0; j < sheepbitch->targets.size(); j++)
-			{
-				if (Vector2(x, y) == sheepbitch->targets[j].position)
-				{
-					color = Pixel(255, 255, 0);
-				}
-			}
-		}*/
-
 		DrawDecal(position, tile, { 1,1 }, color);
 		if (grid.tileTraversibility[i] == 2)
 		{
@@ -141,12 +131,12 @@ void TheEventLoopOfLife::OnUserDraw()
 			}
 		}
 	}
-	for (size_t i = 0; i < entities.size(); i++)
+	for (size_t i = 0; i < entityManager.Size(); i++)
 	{
-		Vector2 position = { tile->Width() * entities[i]->GetPosition().x + dim.x / 2 - centering.x, tile->Height() * entities[i]->GetPosition().y + dim.y / 2 - centering.y };
-		if (entities[i]->entityType != Entity::EntityType::GRASS)
+		Vector2 position = { tile->Width() * entityManager.GetEntity(i)->GetPosition().x + dim.x / 2 - centering.x, tile->Height() * entityManager.GetEntity(i)->GetPosition().y + dim.y / 2 - centering.y };
+		if (entityManager.GetEntity(i)->entityType != Entity::EntityType::GRASS)
 		{
-			entities[i]->Render(*this, position);
+			entityManager.GetEntity(i)->Render(*this, position);
 		}
 	}
 	frameRate.Render(*this);

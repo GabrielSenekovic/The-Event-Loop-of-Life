@@ -12,6 +12,7 @@ using namespace olc;
 #define IntVector2 vi2d
 
 class TheEventLoopOfLife;
+class EntityManager;
 class Grid;
 
 class Entity
@@ -41,6 +42,7 @@ public:
 	EntityState state;
 	std::vector<Decal*> sprites;
 	uint8_t spaceOccupying; //0 = first, 1 = second
+	uint32_t handle;
 	bool dead; //flag for program to delete the entity
 
 	int* getValidConstraints(int i, olc::vi2d grid);
@@ -49,7 +51,7 @@ public:
 	Vector2 GetRandomAdjacentPosition(Random& r, const IntVector2& dim);
 	Vector2 GetRandomAdjacentPosition(Random& r, const IntVector2& dim, const std::vector<std::array<Entity*, 3>>& tileContent, const EntityType& type);
 
-	virtual void Sense(const Grid& grid);
+	virtual void Sense(const Grid& grid, const EntityManager& entityManager);
 	virtual void Decide(Random& r, const IntVector2& dim);
 	virtual void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities);
 

@@ -7,25 +7,29 @@ Wolf::Wolf(const Vector2& position_in, const Vector2& health_in, const std::vect
 	entityType = EntityType::WOLF;
 }
 
-void Wolf::Sense(const Grid& grid)
+void Wolf::Sense(const Grid& grid, const EntityManager& entityManager)
 {
-if (destination != Vector2(-1, -1)) { position = destination; }
-if (target == nullptr)
-{
-	int32_t index = position.x + grid.grid.x * position.y;
-	int* constraints = getValidConstraints(index, 2, grid.grid);
-	targets.clear();
-	for (int y = constraints[3]; y < constraints[5]; y++)
+	if (destination != Vector2(-1, -1)) { position = destination; }
+	target = nullptr;
+	//get target from handle
+	if (target == nullptr)
 	{
-		for (int x = constraints[2]; x < constraints[4]; x++)
+		int32_t index = position.x + grid.grid.x * position.y;
+		int* constraints = getValidConstraints(index, 2, grid.grid);
+		targets.clear();
+		for (int y = constraints[3]; y < constraints[5]; y++)
 		{
-			//Look for sheep
-			int i = grid.GetTileIndexOfEntity(x, y, EntityType::SHEEP);
-			if (i != -1) { targets.push_back(grid.tileContent[x + grid.grid.x * y][i]); }
+			for (int x = constraints[2]; x < constraints[4]; x++)
+			{
+				int i = grid.GetTileIndexOfEntity(x, y, EntityType::SHEEP);
+				if (i != -1) 
+				{ 
+					targets.push_back(grid.tileContent[x + grid.grid.x * y][i]); 
+				}
+			}
 		}
+		delete constraints;
 	}
-	delete constraints;
-}
 }
 
 void Wolf::Decide(Random& r, const IntVector2& dim)
@@ -90,26 +94,21 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 	break;
 	case EntityState::PURSUE:
 	{
-		if (destination == Vector2{ -1, -1 })
+		if (destination == Vector2{ -1, -1 } && target != nullptr && target->position != Vector2{ -1,-1 })
 		{
-			destination = target->position;
-			if (destination == Vector2{ -1,-1 }) { return; }
-			else
+			Vector2 movementDirection = target->position - position;
+			if (movementDirection.mag() == 0)
 			{
-				grid.tileContent[position.x + grid.grid.x * position.y][spaceOccupying] = nullptr;
-				if (grid.tileContent[destination.x + grid.grid.x * destination.y][0] == nullptr) { grid.tileContent[destination.x + grid.grid.x * destination.y][0] = this; spaceOccupying = 0; }
-				else if (grid.tileContent[destination.x + grid.grid.x * destination.y][1] == nullptr) { grid.tileContent[destination.x + grid.grid.x * destination.y][1] = this; spaceOccupying = 1; }
-				else
-				{
-					grid.tileContent[position.x + grid.grid.x * position.y][spaceOccupying] = this;
-					destination = Vector2(-1, -1);
-					state = EntityState::IDLE;
-					return;
-				}
+				state = EntityState::IDLE;
+				return;
 			}
-			if (((position - target->position).mag()) > 3)
+			movementDirection = movementDirection.norm();
+			movementDirection = Vector2(movementDirection.x < 0 ? floor(movementDirection.x) : ceil(movementDirection.x),
+										movementDirection.y < 0 ? floor(movementDirection.y) : ceil(movementDirection.y));
+			if (!TryPursue(destination, movementDirection, grid))
 			{
-				int hello = 4;
+				state = EntityState::IDLE;
+				return;
 			}
 		}
 		Move(deltaTime, timeSpeed);

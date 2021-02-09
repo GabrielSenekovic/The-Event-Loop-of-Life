@@ -63,6 +63,9 @@
     <ClInclude Include="Animal.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="EntityManager.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="olcPixelGameEngine.cpp">
@@ -74,26 +77,17 @@
     <ClCompile Include="TheEventLoopOfLife.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Random.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Text.cpp">
       <Filter>Source Files\Data Types</Filter>
     </ClCompile>
     <ClCompile Include="Numbers.cpp">
       <Filter>Source Files\Data Types</Filter>
     </ClCompile>
-    <ClCompile Include="HUDElement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="Sheep.cpp">
       <Filter>Source Files\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Grid.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Grass.cpp">
       <Filter>Source Files\Entities</Filter>
@@ -103,6 +97,18 @@
     </ClCompile>
     <ClCompile Include="Animal.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Grid.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
+    <ClCompile Include="HUDElement.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

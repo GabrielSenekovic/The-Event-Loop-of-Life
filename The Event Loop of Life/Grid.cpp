@@ -36,6 +36,28 @@ void Grid::PlaceEntityOnGrid(Entity* entity)
 	}
 }
 
+bool Grid::TryOccupyNewPosition(Entity& entity, const int& target_i)
+{
+	int entity_i = entity.position.x + grid.x * entity.position.y;
+	for (int i = 0; i < 2; i++)
+	{
+		if (tileContent[target_i][i] == nullptr)
+		{
+			tileContent[entity_i][entity.spaceOccupying] = nullptr;
+			tileContent[target_i][i] = &entity;
+			entity.spaceOccupying = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+void Grid::ClampPositionToGrid(Vector2& vector)
+{
+	vector = Vector2(vector.x < 0 ? 0 : vector.x >= grid.x ? grid.x - 1 : vector.x,
+					 vector.y < 0 ? 0 : vector.y >= grid.x ? grid.y - 1 : vector.y);
+}
+
 int Grid::GetTileIndexOfEntity(const int& x, const int& y, const Entity::EntityType& entity) const
 {
 	for (int i = 0; i < 2; i++)

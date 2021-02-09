@@ -7,7 +7,7 @@ Sheep::Sheep(const Vector2& position_in, const Vector2& health_in, const std::ve
 	entityType = EntityType::SHEEP;
 }
 
-void Sheep::Sense(const Grid& grid)
+void Sheep::Sense(const Grid& grid, const EntityManager& entityManager)
 {
 	if (destination != Vector2(-1, -1))
 	{

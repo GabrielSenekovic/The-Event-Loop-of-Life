@@ -19,6 +19,9 @@ public:
 	void Initialize(Random& r);
 
 	void PlaceEntityOnGrid(Entity* entity);
+	bool TryOccupyNewPosition(Entity& entity, const int& target_i);
+
+	void ClampPositionToGrid(Vector2& vector);
 
 	int GetTileIndexOfEntity(const int& x, const int& y, const Entity::EntityType& entity) const;
 };
