@@ -1,4 +1,5 @@
 #include "Grass.h"
+#include "Grid.h"
 
 Grass::Grass() :Entity({ -1,-1 }, { 0,0 }, {})
 {
@@ -22,12 +23,12 @@ Grass::Grass(const Vector2& position_in, const Vector2& health_in, const std::ve
 	spaceOccupying = 2;
 }
 
-void Grass::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVector2& dim)
+void Grass::Sense(const Grid& grid)
 {
 	//Am I being eaten or trampled?
-	isBeingTrampled = (grid[position.x + dim.x * position.y][0] != nullptr || grid[position.x + dim.x * position.y][1] != nullptr);
-	isBeingEaten = ((grid[position.x + dim.x * position.y][0] != nullptr && grid[position.x + dim.x * position.y][0]->entityType == EntityType::SHEEP && grid[position.x + dim.x * position.y][0]->state == EntityState::EAT) ||
-		(grid[position.x + dim.x * position.y][1] != nullptr && grid[position.x + dim.x * position.y][1]->entityType == EntityType::SHEEP && grid[position.x + dim.x * position.y][1]->state == EntityState::EAT));
+	isBeingTrampled = (grid.tileContent[position.x + grid.grid.x * position.y][0] != nullptr || grid.tileContent[position.x + grid.grid.x * position.y][1] != nullptr);
+	isBeingEaten = ((grid.tileContent[position.x + grid.grid.x * position.y][0] != nullptr && grid.tileContent[position.x + grid.grid.x * position.y][0]->entityType == EntityType::SHEEP && grid.tileContent[position.x + grid.grid.x * position.y][0]->state == EntityState::EAT) ||
+		(grid.tileContent[position.x + grid.grid.x * position.y][1] != nullptr && grid.tileContent[position.x + grid.grid.x * position.y][1]->entityType == EntityType::SHEEP && grid.tileContent[position.x + grid.grid.x * position.y][1]->state == EntityState::EAT));
 	if (maturity == Maturity::GROWING && health.x >= health.y)
 	{
 		maturity = Maturity::MATURE;
@@ -52,7 +53,7 @@ void Grass::Decide(Random& r, const IntVector2& dim)
 	}
 }
 
-void Grass::Act(Random& r, const IntVector2& dim, const float& deltaTime, const float& timeSpeed, std::vector<std::array<Entity*, 3>>& tileContent, std::vector<Entity*>& entities)
+void Grass::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities)
 {
 	//Grow if not being trampled, wither if it has been mature for a while. Disappear if no HP
 	if (state == EntityState::BREED)
@@ -60,12 +61,12 @@ void Grass::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 		Vector2 whereToGrow = { -1,-1 };
 		if (whereToGrow == Vector2{ -1, -1 })
 		{
-			whereToGrow = GetRandomAdjacentPosition(r, dim, tileContent, EntityType::GRASS);
+			whereToGrow = GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, EntityType::GRASS);
 			if (whereToGrow == Vector2{ -1,-1 }) { return; }
 			else
 			{
 				Grass* temp = new Grass(whereToGrow, { (r.myRand() % 5) + 2.0f, 6.0f }, sprites);
-				tileContent[whereToGrow.x + dim.x * whereToGrow.y][2] = temp;
+				grid.tileContent[whereToGrow.x + grid.grid.x * whereToGrow.y][2] = temp;
 				entities.push_back(temp);
 			}
 		}

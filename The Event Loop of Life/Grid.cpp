@@ -35,3 +35,15 @@ void Grid::PlaceEntityOnGrid(Entity* entity)
 		int oops = 0;
 	}
 }
+
+int Grid::GetTileIndexOfEntity(const int& x, const int& y, const Entity::EntityType& entity) const
+{
+	for (int i = 0; i < 2; i++)
+	{
+		if (tileContent[x + grid.x * y][i] != nullptr && tileContent[x + grid.x * y][i]->entityType == entity)
+		{
+			return i;
+		}
+	}
+	return -1;
+}

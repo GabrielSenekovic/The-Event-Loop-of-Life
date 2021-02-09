@@ -49,11 +49,10 @@ bool TheEventLoopOfLife::OnUserCreate()
 		Sheep* temp_sheep = new Sheep({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, {sheep, sheep_eating, wander, pursue, breed});
 		entities.push_back(temp_sheep);
 		grid.PlaceEntityOnGrid(temp_sheep);
+		Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, { wolf, wander, pursue, breed });
+		entities.push_back(temp_wolf);
+		grid.PlaceEntityOnGrid(temp_wolf);
 	}
-
-	Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, {wolf, wander, pursue, breed});
-	entities.push_back(temp_wolf);
-	grid.PlaceEntityOnGrid(temp_wolf);
 
 	return true;
 }
@@ -77,10 +76,10 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 
 		if (timer == 0)
 		{
-			entities[i]->Sense(grid.tileContent, grid.grid);
+			entities[i]->Sense(grid);
 			entities[i]->Decide(r, grid.grid);
 		}
-		entities[i]->Act(r, grid.grid, fElapsedTime, timeSpeed, grid.tileContent, entities);
+		entities[i]->Act(r, grid, fElapsedTime, timeSpeed, entities);
 		if (entities[i]->dead)
 		{
 			grid.tileContent[entities[i]->position.x + grid.grid.x * entities[i]->position.y][entities[i]->spaceOccupying] = nullptr;

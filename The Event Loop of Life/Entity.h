@@ -12,6 +12,7 @@ using namespace olc;
 #define IntVector2 vi2d
 
 class TheEventLoopOfLife;
+class Grid;
 
 class Entity
 {
@@ -48,9 +49,9 @@ public:
 	Vector2 GetRandomAdjacentPosition(Random& r, const IntVector2& dim);
 	Vector2 GetRandomAdjacentPosition(Random& r, const IntVector2& dim, const std::vector<std::array<Entity*, 3>>& tileContent, const EntityType& type);
 
-	virtual void Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVector2& dim);
+	virtual void Sense(const Grid& grid);
 	virtual void Decide(Random& r, const IntVector2& dim);
-	virtual void Act(Random& r, const IntVector2& dim, const float& deltaTime, const float& timeSpeed, std::vector<std::array<Entity*, 3>>& tileContent, std::vector<Entity*>& entities);
+	virtual void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities);
 
 	virtual Vector2 GetPosition();
 

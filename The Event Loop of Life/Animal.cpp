@@ -1,4 +1,5 @@
 #include "Animal.h"
+#include "Grid.h"
 
 Animal::Animal(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in):
 	Entity(position_in, health_in, sprites_in), 
@@ -47,6 +48,31 @@ void Animal::Move(const float& deltaTime, const float& timeSpeed)
 		position = destination;
 		destination = { -1,-1 };
 	}
+}
+
+void Animal::Wander(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed)
+{
+	if (destination == Vector2{ -1, -1 })
+	{
+		destination = Entity::GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, entityType);
+		if (destination == Vector2{ -1,-1 }) { return; }
+		else
+		{
+			grid.tileContent[position.x + grid.grid.x * position.y][spaceOccupying] = nullptr;
+			if (grid.tileContent[destination.x + grid.grid.x * destination.y][0] == nullptr) { grid.tileContent[destination.x + grid.grid.x * destination.y][0] = this; spaceOccupying = 0; }
+			else { grid.tileContent[destination.x + grid.grid.x * destination.y][1] = this; spaceOccupying = 1; }
+		}
+	}
+	Move(deltaTime, timeSpeed);
+}
+
+void Animal::Die()
+{
+	if (destination != Vector2(-1, -1))
+	{
+		position = destination;
+	}
+	dead = true;
 }
 
 Vector2 Animal::GetPosition()

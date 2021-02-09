@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "TheEventLoopOfLife.h"
+#include "Grid.h"
 
 Entity::Entity(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in) :
 	position(position_in), health(health_in),
@@ -88,7 +89,7 @@ Vector2 Entity::GetRandomAdjacentPosition(Random& r, const IntVector2& dim, cons
 }
 
 
-void Entity::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVector2& dim)
+void Entity::Sense(const Grid& grid)
 {
 }
 
@@ -96,7 +97,7 @@ void Entity::Decide(Random& r, const IntVector2& dim)
 {
 }
 
-void Entity::Act(Random& r, const IntVector2& dim, const float& deltaTime, const float& timeSpeed, std::vector<std::array<Entity*, 3>>& tileContent, std::vector<Entity*>& entities)
+void Entity::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities)
 {
 }
 

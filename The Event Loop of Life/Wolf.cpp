@@ -7,35 +7,25 @@ Wolf::Wolf(const Vector2& position_in, const Vector2& health_in, const std::vect
 	entityType = EntityType::WOLF;
 }
 
-void Wolf::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVector2& dim)
+void Wolf::Sense(const Grid& grid)
 {
-	if (destination != Vector2(-1, -1))
+if (destination != Vector2(-1, -1)) { position = destination; }
+if (target == nullptr)
+{
+	int32_t index = position.x + grid.grid.x * position.y;
+	int* constraints = getValidConstraints(index, 2, grid.grid);
+	targets.clear();
+	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
-		position = destination;
-		//destination = Vector2(-1, -1);
-	}
-	if (target == nullptr)
-	{
-		int32_t index = position.x + dim.x * position.y;
-		int* constraints = getValidConstraints(index, 2, dim);
-		targets.clear();
-		for (int y = constraints[3]; y < constraints[5]; y++)
+		for (int x = constraints[2]; x < constraints[4]; x++)
 		{
-			for (int x = constraints[2]; x < constraints[4]; x++)
-			{
-				//Look for sheep
-				if ((grid[x + dim.x * y][0] != nullptr && grid[x + dim.x * y][0]->entityType == EntityType::SHEEP))
-				{
-					targets.push_back(grid[x + dim.x * y][0]);
-				}
-				if ((grid[x + dim.x * y][1] != nullptr && grid[x + dim.x * y][1]->entityType == EntityType::SHEEP))
-				{
-					targets.push_back(grid[x + dim.x * y][1]);
-				}
-			}
+			//Look for sheep
+			int i = grid.GetTileIndexOfEntity(x, y, EntityType::SHEEP);
+			if (i != -1) { targets.push_back(grid.tileContent[x + grid.grid.x * y][i]); }
 		}
-		delete constraints;
 	}
+	delete constraints;
+}
 }
 
 void Wolf::Decide(Random& r, const IntVector2& dim)
@@ -70,13 +60,13 @@ void Wolf::Decide(Random& r, const IntVector2& dim)
 	}
 }
 
-void Wolf::Act(Random& r, const IntVector2& dim, const float& deltaTime, const float& timeSpeed, std::vector<std::array<Entity*, 3>>& tileContent, std::vector<Entity*>& entities)
+void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities)
 {
 	switch (state)
 	{
 	case EntityState::BREED:
 	{
-		Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
+		Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, EntityType::WOLF);
 		if (breedingPlace == Vector2{ -1,-1 }) { return; }
 		else
 		{
@@ -89,15 +79,15 @@ void Wolf::Act(Random& r, const IntVector2& dim, const float& deltaTime, const f
 	case EntityState::EAT:
 	{
 		int placementOfPrey = spaceOccupying == 0 ? 1 : 0;
-		if (tileContent[position.x + dim.x * position.y][placementOfPrey] != nullptr)
+		if (grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey] != nullptr)
 		{
 			health.x += 5;
-			tileContent[position.x + dim.x * position.y][placementOfPrey]->health.x = 0;
+			grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey]->health.x = 0;
 		}
 		state = EntityState::IDLE;
 		target = nullptr;
 	}
-		break;
+	break;
 	case EntityState::PURSUE:
 	{
 		if (destination == Vector2{ -1, -1 })
@@ -106,48 +96,29 @@ void Wolf::Act(Random& r, const IntVector2& dim, const float& deltaTime, const f
 			if (destination == Vector2{ -1,-1 }) { return; }
 			else
 			{
-				tileContent[position.x + dim.x * position.y][spaceOccupying] = nullptr;
-				if (tileContent[destination.x + dim.x * destination.y][0] == nullptr) { tileContent[destination.x + dim.x * destination.y][0] = this; spaceOccupying = 0; }
-				else if (tileContent[destination.x + dim.x * destination.y][1] == nullptr) { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
+				grid.tileContent[position.x + grid.grid.x * position.y][spaceOccupying] = nullptr;
+				if (grid.tileContent[destination.x + grid.grid.x * destination.y][0] == nullptr) { grid.tileContent[destination.x + grid.grid.x * destination.y][0] = this; spaceOccupying = 0; }
+				else if (grid.tileContent[destination.x + grid.grid.x * destination.y][1] == nullptr) { grid.tileContent[destination.x + grid.grid.x * destination.y][1] = this; spaceOccupying = 1; }
 				else
 				{
-					tileContent[position.x + dim.x * position.y][spaceOccupying] = this;
+					grid.tileContent[position.x + grid.grid.x * position.y][spaceOccupying] = this;
 					destination = Vector2(-1, -1);
 					state = EntityState::IDLE;
 					return;
 				}
 			}
-		}
-		Move(deltaTime, timeSpeed);
-	}break;
-	case EntityState::WANDER:
-		//Go in a random direction
-	{
-		if (destination == Vector2{ -1, -1 })
-		{
-			destination = GetRandomAdjacentPosition(r, dim, 2, tileContent, EntityType::WOLF);
-			if (destination == Vector2{ -1,-1 }) { return; }
-			else
+			if (((position - target->position).mag()) > 3)
 			{
-				tileContent[position.x + dim.x * position.y][spaceOccupying] = nullptr;
-				if (tileContent[destination.x + dim.x * destination.y][0] == nullptr) { tileContent[destination.x + dim.x * destination.y][0] = this; spaceOccupying = 0; }
-				else { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
+				int hello = 4;
 			}
 		}
 		Move(deltaTime, timeSpeed);
 	}break;
-	case EntityState::DEATH:
-	{
-		//play death animation
-		if (destination != Vector2(-1, -1))
-		{
-			position = destination;
-		}
-		dead = true;
-	}
+	case EntityState::WANDER:{Wander(r, grid, deltaTime, timeSpeed); }break;
+	case EntityState::DEATH: {Die(); }break;
 	default: break;
 	}
-	health.x -= 1 / (timeSpeed / deltaTime);
+	//health.x -= 1 / (timeSpeed / deltaTime);
 }
 
 void Wolf::Render(TheEventLoopOfLife& game, Vector2 renderPosition)

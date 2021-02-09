@@ -7,7 +7,7 @@ Sheep::Sheep(const Vector2& position_in, const Vector2& health_in, const std::ve
 	entityType = EntityType::SHEEP;
 }
 
-void Sheep::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVector2& dim)
+void Sheep::Sense(const Grid& grid)
 {
 	if (destination != Vector2(-1, -1))
 	{
@@ -15,34 +15,28 @@ void Sheep::Sense(const std::vector<std::array<Entity*, 3>>& grid, const IntVect
 		//destination = Vector2(-1, -1);
 	}
 	//Check if there are wolves too close. If there are, take several more wolves in a range into account.
-	int32_t index = position.x + dim.x * position.y;
-	int* constraints = getValidConstraints(index, dim);
+	int32_t index = position.x + grid.grid.x * position.y;
+	int* constraints = getValidConstraints(index, grid.grid);
 	targets.clear();
 	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
 		for (int x = constraints[2]; x < constraints[4]; x++)
 		{
-			if (grid[x + dim.x * y][2] != nullptr) //index 2 is always grass
+			if (grid.tileContent[x + grid.grid.x * y][2] != nullptr) //index 2 is always grass
 			{
-				targets.push_back(*grid[x + dim.x * y][2]);
+				targets.push_back(*grid.tileContent[x + grid.grid.x * y][2]);
 			}
 		}
 	}
 	delete constraints;
-	constraints = getValidConstraints(index, 2, dim);
+	constraints = getValidConstraints(index, 2, grid.grid);
 	threats.clear();
 	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
 		for (int x = constraints[2]; x < constraints[4]; x++)
 		{
-			if ((grid[x + dim.x * y][0] != nullptr && grid[x + dim.x * y][0]->entityType == EntityType::WOLF))
-			{
-				threats.push_back(grid[x + dim.x * y][0]);
-			}
-			if ((grid[x + dim.x * y][1] != nullptr && grid[x + dim.x * y][1]->entityType == EntityType::WOLF))
-			{
-				threats.push_back(grid[x + dim.x * y][1]);
-			}
+			int i = grid.GetTileIndexOfEntity(x, y, EntityType::WOLF);
+			if (i != -1) { threats.push_back(grid.tileContent[x + grid.grid.x * y][i]); }
 		}
 	}
 	delete constraints;
@@ -102,13 +96,13 @@ void Sheep::Decide(Random& r, const IntVector2& dim)
 	}
 }
 
-void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const float& timeSpeed, std::vector<std::array<Entity*, 3>>& tileContent, std::vector<Entity*>& entities)
+void Sheep::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities)
 {
 	switch (state)
 	{
 		case EntityState::BREED:
 		{
-			Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
+			Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, EntityType::SHEEP);
 			if (breedingPlace == Vector2{ -1,-1 }) { return; }
 			else
 			{
@@ -119,10 +113,10 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 			}
 		}break;
 		case EntityState::EAT:
-			if (tileContent[position.x + dim.x * position.y][2] != nullptr) //Because sometimes the sheep might try to eat grass that another sheep just ate
+			if (grid.tileContent[position.x + grid.grid.x * position.y][2] != nullptr) //Because sometimes the sheep might try to eat grass that another sheep just ate
 			{
 				health.x += 5;
-				tileContent[position.x + dim.x * position.y][2]->health.x = 0;
+				grid.tileContent[position.x + grid.grid.x * position.y][2]->health.x = 0;
 			}
 			state = EntityState::IDLE;
 			break;
@@ -135,12 +129,12 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 				if (destination == Vector2{ -1,-1 }) { return; }
 				else
 				{
-					tileContent[position.x + dim.x * position.y][spaceOccupying] = nullptr;
-					if (tileContent[destination.x + dim.x * destination.y][0] == nullptr) { tileContent[destination.x + dim.x * destination.y][0] = this; spaceOccupying = 0; }
-					else if (tileContent[destination.x + dim.x * destination.y][1] == nullptr) { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
+					grid.tileContent[position.x + grid.grid.x * position.y][spaceOccupying] = nullptr;
+					if (grid.tileContent[destination.x + grid.grid.x * destination.y][0] == nullptr) { grid.tileContent[destination.x + grid.grid.x * destination.y][0] = this; spaceOccupying = 0; }
+					else if (grid.tileContent[destination.x + grid.grid.x * destination.y][1] == nullptr) { grid.tileContent[destination.x + grid.grid.x * destination.y][1] = this; spaceOccupying = 1; }
 					else
 					{
-						tileContent[position.x + dim.x * position.y][spaceOccupying] = this;
+						grid.tileContent[position.x + grid.grid.x * position.y][spaceOccupying] = this;
 						destination = Vector2(-1, -1);
 						state = EntityState::IDLE;
 						return;
@@ -149,31 +143,8 @@ void Sheep::Act(Random& r, const IntVector2& dim, const float& deltaTime, const 
 			}
 			Move(deltaTime, timeSpeed);
 		}break;
-		case EntityState::WANDER:
-			//Go in a random direction
-		{
-			if (destination == Vector2{ -1, -1 })
-			{
-				destination = Entity::GetRandomAdjacentPosition(r, dim, tileContent, EntityType::SHEEP);
-				if (destination == Vector2{ -1,-1 }) { return; }
-				else
-				{
-					tileContent[position.x + dim.x * position.y][spaceOccupying] = nullptr;
-					if (tileContent[destination.x + dim.x * destination.y][0] == nullptr) { tileContent[destination.x + dim.x * destination.y][0] = this; spaceOccupying = 0; }
-					else { tileContent[destination.x + dim.x * destination.y][1] = this; spaceOccupying = 1; }
-				}
-			}
-			Move(deltaTime, timeSpeed);
-		}break;
-		case EntityState::DEATH:
-		{
-			//play death animation
-			if (destination != Vector2(-1, -1))
-			{
-				position = destination;
-			}
-			dead = true;
-		}
+		case EntityState::WANDER:{Wander(r, grid, deltaTime, timeSpeed);}break;
+		case EntityState::DEATH: {Die(); }break;
 	default: break;
 	}
 	//health.x -= 1 / (timeSpeed / deltaTime);
