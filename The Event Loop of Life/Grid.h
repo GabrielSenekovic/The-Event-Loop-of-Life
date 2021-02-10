@@ -10,7 +10,7 @@ using namespace olc;
 class Grid
 {
 public:
-	IntVector2 grid = { 20, 20 };
+	IntVector2 grid = { 50, 50 };
 	std::vector<Pixel> tileColors;
 	std::vector<int> tileTraversibility; //I like to make it a bit more intricate
 	std::vector<std::array<Entity*, 3>> tileContent;

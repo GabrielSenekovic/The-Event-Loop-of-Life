@@ -12,9 +12,11 @@ class EntityManager
 public:
 	EntityManager();
 	std::vector<Entity*> entities;
+	std::vector<Crow> crows;
 	void Add(Entity* entity);
 	Entity* GetEntity(const uint32_t& i);
 	Entity* GetEntityFromHandle(const uint32_t& i) const;
+	void UpdateBoid(const int& i);
 	uint32_t nextHandle;
 	size_t Size();
 };

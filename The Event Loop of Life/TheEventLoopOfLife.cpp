@@ -17,6 +17,7 @@ bool TheEventLoopOfLife::OnUserCreate()
 	wander = new Decal(new Sprite("./Assets/Spotted.png"));
 	pursue = new Decal(new Sprite("./Assets/Discovered.png"));
 	breed = new Decal(new Sprite("./Assets/Breed.png"));
+	crow = new Decal(new Sprite("./Assets/Crow.png"));
 
 	grid.Initialize(r);
 
@@ -53,6 +54,10 @@ bool TheEventLoopOfLife::OnUserCreate()
 		entityManager.Add(temp_wolf);
 		grid.PlaceEntityOnGrid(temp_wolf);
 	}
+	for (int i = 0; i < 50; i++)
+	{
+		entityManager.crows.push_back(Crow(grid.grid));
+	}
 
 	return true;
 }
@@ -87,6 +92,12 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 			entityManager.entities.erase(entityManager.entities.begin() + i);
 			i--;
 		}
+	}
+
+	for (int i = 0; i < entityManager.crows.size(); i++)
+	{
+		entityManager.UpdateBoid(i);
+		entityManager.crows[i].Move(fElapsedTime, grid.grid);
 	}
 	
 	frameRate.number.Reset(); 
@@ -138,6 +149,11 @@ void TheEventLoopOfLife::OnUserDraw()
 		{
 			entityManager.GetEntity(i)->Render(*this, position);
 		}
+	}
+	for (size_t i = 0; i < entityManager.crows.size(); i++)
+	{
+		Vector2 position = { tile->Width() * entityManager.crows[i].position.x + dim.x / 2 - centering.x, tile->Height() * entityManager.crows[i].position.y + dim.y / 2 - centering.y };
+		DrawRotatedDecal(position, crow, entityManager.crows[i].angle, { (float)crow->sprite->width/2,(float)crow->sprite->height/2 }, { 1,1 }, olc::WHITE);
 	}
 	frameRate.Render(*this);
 	amountOfTurns.Render(*this);

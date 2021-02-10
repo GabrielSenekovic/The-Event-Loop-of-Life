@@ -60,8 +60,22 @@ public:
 	virtual void Render(TheEventLoopOfLife& game, Vector2 position);
 };
 
-class Crow : Entity
+class Crow
 {
+public:
+	Vector2 position;
+	Vector2 velocity;
+	float cohesionRadius = 8;
+	float alignmentRadius = cohesionRadius / 1.5f;
+	float separationRadius = alignmentRadius / 2;
+	float angle = 0;
 
+	bool cohesion = true;
+	bool alignment = true;
+	bool separation = true;
+
+	Crow(const Vector2& dim);
+
+	void Move(float fElapsedTime, const Vector2& dim);
 };
 #endif

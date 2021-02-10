@@ -44,6 +44,7 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 	olc::Decal* wander; //A question mark
 	olc::Decal* pursue; //An exclamation point
 	olc::Decal* breed; //A heart
+	olc::Decal* crow;
 
 	HUDElement frameRate;
 	HUDElement amountOfTurns;
