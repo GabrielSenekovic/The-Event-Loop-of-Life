@@ -52,10 +52,10 @@ void Animal::Move(const float& deltaTime, const float& timeSpeed)
 
 bool Animal::TryPursue(Vector2& destination, const Vector2& direction, Grid& grid)
 {
-	for (int i = 2; i > 0; i--)			//i signifies amount of steps forward
+	for (int i = 2; i > 0; i--)								//i signifies amount of steps forward
 	{
-		Vector2 temp = direction * i;	//multiply the direction by the amount of steps
-		temp += position;				//add it to the position
+		Vector2 temp = direction * i;						//multiply the direction by the amount of steps
+		temp += position;									//add it to the position
 		grid.ClampPositionToGrid(temp);
 		int target_i = temp.x + grid.grid.x * temp.y;
 		if (grid.TryOccupyNewPosition(*this, target_i))

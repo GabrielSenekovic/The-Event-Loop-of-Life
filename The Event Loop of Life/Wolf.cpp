@@ -2,7 +2,7 @@
 #include "TheEventLoopOfLife.h"
 
 Wolf::Wolf(const Vector2& position_in, const Vector2& health_in, const std::vector<Decal*>& sprites_in) : Animal(position_in, health_in, sprites_in),
-	renderState(EntityState::IDLE)
+renderState(EntityState::IDLE), target_handle(-1)
 {
 	entityType = EntityType::WOLF;
 }
@@ -10,8 +10,7 @@ Wolf::Wolf(const Vector2& position_in, const Vector2& health_in, const std::vect
 void Wolf::Sense(const Grid& grid, const EntityManager& entityManager)
 {
 	if (destination != Vector2(-1, -1)) { position = destination; }
-	target = nullptr;
-	//get target from handle
+	target = entityManager.GetEntityFromHandle(target_handle);
 	if (target == nullptr)
 	{
 		int32_t index = position.x + grid.grid.x * position.y;
@@ -56,6 +55,7 @@ void Wolf::Decide(Random& r, const IntVector2& dim)
 		state = EntityState::PURSUE;
 		renderState = EntityState::PURSUE;
 		target = targets[r.myRand() % targets.size()];
+		target_handle = target->handle;
 	}
 	else
 	{
@@ -87,11 +87,12 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 		{
 			health.x += 5;
 			grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey]->health.x = 0;
+			state = EntityState::IDLE;
+			target = nullptr;
+			break;
 		}
-		state = EntityState::IDLE;
-		target = nullptr;
+		state = EntityState::PURSUE;
 	}
-	break;
 	case EntityState::PURSUE:
 	{
 		if (destination == Vector2{ -1, -1 } && target != nullptr && target->position != Vector2{ -1,-1 })

@@ -54,24 +54,26 @@ void Sheep::Decide(Random& r, const IntVector2& dim)
 	{
 		state = EntityState::EVADE;
 		renderState = EntityState::EVADE;
-		Vector2 averageDirection;
-		for (int i = 0; i < threats.size(); i++)
+		int32_t index = position.x + dim.x * position.y;
+		int* constraints = getValidConstraints(index, dim);
+		float lastDistance = 0;
+		for (int y = constraints[3]; y < constraints[5]; y++)
 		{
-			averageDirection += position - threats[i]->position;
+			for (int x = constraints[2]; x < constraints[4]; x++)
+			{
+				float distance = 0;
+				for (int i = 0; i < threats.size(); i++)
+				{
+					distance += (Vector2(x, y) - threats[i]->position).mag();
+				}
+				if (distance > lastDistance)
+				{
+					targetPosition = Vector2(x, y);
+					lastDistance = distance;
+				}
+			}
 		}
-		averageDirection /= threats.size();
-		//averageDirection *= -1; //This only gives us the direction to move in, not the position to move to
-		if (averageDirection.mag() == 0)
-		{
-			state = EntityState::IDLE;
-			return;
-		}
-		averageDirection = averageDirection.norm();
-		averageDirection = Vector2(averageDirection.x < 0 ? floor(averageDirection.x) : ceil(averageDirection.x), 
-								   averageDirection.y < 0 ? floor(averageDirection.y) : ceil(averageDirection.y));
-		targetPosition = position + averageDirection;
-		targetPosition = Vector2(targetPosition.x < 0 ? 0 : targetPosition.x >= dim.x ? dim.x -1 : targetPosition.x,
-								 targetPosition.y < 0 ? 0 : targetPosition.y >= dim.x ? dim.y -1: targetPosition.y);
+		delete constraints;
 	}
 	else if (position == destination && state == EntityState::PURSUE)
 	{
