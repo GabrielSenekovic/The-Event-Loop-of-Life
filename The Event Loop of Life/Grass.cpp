@@ -54,7 +54,7 @@ void Grass::Decide(Random& r, const IntVector2& dim)
 	}
 }
 
-void Grass::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities)
+void Grass::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, EntityManager& entities)
 {
 	//Grow if not being trampled, wither if it has been mature for a while. Disappear if no HP
 	if (state == EntityState::BREED)
@@ -68,7 +68,7 @@ void Grass::Act(Random& r, Grid& grid, const float& deltaTime, const float& time
 			{
 				Grass* temp = new Grass(whereToGrow, { (r.myRand() % 5) + 2.0f, 6.0f }, sprites);
 				grid.tileContent[whereToGrow.x + grid.grid.x * whereToGrow.y][2] = temp;
-				entities.push_back(temp);
+				entities.Add(temp);
 			}
 		}
 		state = EntityState::IDLE;

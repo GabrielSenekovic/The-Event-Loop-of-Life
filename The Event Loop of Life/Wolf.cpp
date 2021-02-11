@@ -35,9 +35,9 @@ void Wolf::Decide(Random& r, const IntVector2& dim)
 {
 	if (health.x <= 0)
 	{
-		//state = EntityState::DEATH;
-		//renderState = EntityState::DEATH;
-		//return;
+		state = EntityState::DEATH;
+		renderState = EntityState::DEATH;
+		return;
 	}
 	//Breed if not being chased by wolves
 	if (target != nullptr && position == target->position)
@@ -64,7 +64,7 @@ void Wolf::Decide(Random& r, const IntVector2& dim)
 	}
 }
 
-void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities)
+void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, EntityManager& entities)
 {
 	switch (state)
 	{
@@ -76,7 +76,7 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 		{
 			health.x -= (health.y * 0.4f);
 			Wolf* temp = new Wolf(position, { (health.y * 0.4f), health.y }, sprites);
-			entities.push_back(temp);
+			entities.Add(temp);
 			state = EntityState::IDLE;
 		}
 	}break;
@@ -87,6 +87,8 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 		{
 			health.x += 5;
 			grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey]->health.x = 0;
+			dynamic_cast<Animal*>(grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey])->Die(); 
+			//This is ok since only animals can occupy position 0 and 1
 			state = EntityState::IDLE;
 			target = nullptr;
 			break;
@@ -118,7 +120,7 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 	case EntityState::DEATH: {Die(); }break;
 	default: break;
 	}
-	//health.x -= 1 / (timeSpeed / deltaTime);
+	health.x -= 1 / (timeSpeed / deltaTime);
 }
 
 void Wolf::Render(TheEventLoopOfLife& game, Vector2 renderPosition)

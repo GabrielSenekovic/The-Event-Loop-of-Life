@@ -53,7 +53,7 @@ public:
 
 	virtual void Sense(const Grid& grid, const EntityManager& entityManager);
 	virtual void Decide(Random& r, const IntVector2& dim);
-	virtual void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities);
+	virtual void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, EntityManager& entities);
 
 	virtual Vector2 GetPosition();
 

@@ -32,17 +32,17 @@ void EntityManager::Initialize(Random& r, Grid& grid)
 		Sheep* temp_sheep = new Sheep({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, { sheep, sheep_eating, wander, pursue, breed });
 		Add(temp_sheep);
 		grid.PlaceEntityOnGrid(temp_sheep);
-		Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, { wolf, wander, pursue, breed });
+		Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 50, { wolf, wander, pursue, breed });
 		Add(temp_wolf);
 		grid.PlaceEntityOnGrid(temp_wolf);
 	}
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		crows.push_back(Crow(grid.grid));
 	}
 }
 
-EntityManager::~EntityManager()
+void EntityManager::Quit()
 {
 	DEL(sheep);
 	DEL(wander);

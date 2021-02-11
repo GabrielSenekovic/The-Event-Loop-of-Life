@@ -98,7 +98,7 @@ void Entity::Decide(Random& r, const IntVector2& dim)
 {
 }
 
-void Entity::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities)
+void Entity::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, EntityManager& entities)
 {
 }
 

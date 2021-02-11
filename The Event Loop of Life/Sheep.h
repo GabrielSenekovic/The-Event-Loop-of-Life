@@ -15,7 +15,7 @@ public:
 
 	void Sense(const Grid& grid, const EntityManager& entityManager) override;
 	void Decide(Random& r, const IntVector2& dim) override;
-	void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, std::vector<Entity*>& entities) override;
+	void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, EntityManager& entities) override;
 
 	void Render(TheEventLoopOfLife& game, Vector2 position) override;
 };

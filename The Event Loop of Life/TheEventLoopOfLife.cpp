@@ -51,7 +51,7 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 			entityManager.GetEntity(i)->Sense(grid, entityManager);
 			entityManager.GetEntity(i)->Decide(r, grid.grid);
 		}
-		entityManager.GetEntity(i)->Act(r, grid, fElapsedTime, timeSpeed, entityManager.entities);
+		entityManager.GetEntity(i)->Act(r, grid, fElapsedTime, timeSpeed, entityManager);
 		if (entityManager.GetEntity(i)->dead)
 		{
 			grid.tileContent[entityManager.GetEntity(i)->position.x + grid.grid.x * entityManager.GetEntity(i)->position.y][entityManager.GetEntity(i)->spaceOccupying] = nullptr;

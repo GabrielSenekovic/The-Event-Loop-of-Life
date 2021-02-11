@@ -28,7 +28,7 @@ public:
 
 	EntityManager();
 	void Initialize(Random& r, Grid& grid);
-	~EntityManager();
+	void Quit();
 
 	std::vector<Entity*> entities;
 	std::vector<Crow> crows;
