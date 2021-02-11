@@ -10,10 +10,11 @@ void Grid::Initialize(Random& r)
 {
 	for (size_t i = 0; i < grid.x * grid.y; i++)
 	{
-		tileTraversibility.push_back(r.myRand() % 2); //0 == no resistance, 1 == -1 movement, 2 == rock
-		int probability = r.myRand() % 100;
-		tileTraversibility[i] = probability >= 85 ? 2 : tileTraversibility[i];
-		Pixel color = tileTraversibility[i] == 2 ? Pixel{ 60, 50, 30 } : Pixel{ 10, 170, 10 };
+		//tileTraversibility.push_back(r.myRand() % 2); //0 == no resistance, 1 == -1 movement, 2 == rock
+		//int probability = r.myRand() % 100;
+		//tileTraversibility[i] = probability >= 85 ? 2 : tileTraversibility[i];
+		//Pixel color = tileTraversibility[i] == 2 ? Pixel{ 60, 50, 30 } : Pixel{ 10, 170, 10 };
+		Pixel color = Pixel{ 10, 170, 10 };
 		tileColors.push_back(r.GetSimilarColor(color, 50));
 	}
 }

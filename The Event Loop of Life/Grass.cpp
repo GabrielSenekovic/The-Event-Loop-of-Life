@@ -1,5 +1,6 @@
 #include "Grass.h"
 #include "Grid.h"
+#include "TheEventLoopOfLife.h"
 
 Grass::Grass() :Entity({ -1,-1 }, { 0,0 }, {})
 {
@@ -90,6 +91,15 @@ void Grass::Act(Random& r, Grid& grid, const float& deltaTime, const float& time
 	}
 }
 
-void Grass::Render(TheEventLoopOfLife& game, Vector2 renderPosition)
+void Grass::Render(TheEventLoopOfLife& game, Vector2 renderPosition, const Pixel& color)
 {
+	switch (maturity)
+	{
+	case Grass::Maturity::GROWING:	
+		game.DrawDecal(renderPosition, sprites[1], { 1,1 }, color); break;
+	case Grass::Maturity::MATURE: 
+		game.DrawDecal(renderPosition, sprites[0], { 1,1 }, color); break;
+	case Grass::Maturity::WITHERING: 
+		game.DrawDecal(renderPosition, sprites[0], { 1,1 }, Pixel(158, 124, 66)); break;
+	}
 }

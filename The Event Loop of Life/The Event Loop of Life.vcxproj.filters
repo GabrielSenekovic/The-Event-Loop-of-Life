@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Entities">
       <UniqueIdentifier>{0941592d-895f-436e-ac55-18135c0e0f5a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{4983430b-aa3b-4b28-ae8e-d7e3c8f9200f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="olcPixelGameEngine.h">
@@ -64,6 +67,9 @@
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="EntityManager.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Crow.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
@@ -110,5 +116,52 @@
     <ClCompile Include="EntityManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Crow.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Asleep.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Breed.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Busy.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Crow.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Discovered.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Grass.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Grass_Growing.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Letters.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Rock.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Sheep.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Sheep_Eating.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Spotted.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Tile.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Wolf.png">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>

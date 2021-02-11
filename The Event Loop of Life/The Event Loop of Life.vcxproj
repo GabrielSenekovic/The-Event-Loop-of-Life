@@ -99,6 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Animal.h" />
+    <ClInclude Include="Crow.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Grass.h" />
@@ -154,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animal.cpp" />
+    <ClCompile Include="Crow.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="Grass.cpp" />
@@ -167,6 +170,22 @@
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="TheEventLoopOfLife.cpp" />
     <ClCompile Include="Wolf.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Asleep.png" />
+    <Image Include="Assets\Breed.png" />
+    <Image Include="Assets\Busy.png" />
+    <Image Include="Assets\Crow.png" />
+    <Image Include="Assets\Discovered.png" />
+    <Image Include="Assets\Grass.png" />
+    <Image Include="Assets\Grass_Growing.png" />
+    <Image Include="Assets\Letters.png" />
+    <Image Include="Assets\Rock.png" />
+    <Image Include="Assets\Sheep.png" />
+    <Image Include="Assets\Sheep_Eating.png" />
+    <Image Include="Assets\Spotted.png" />
+    <Image Include="Assets\Tile.png" />
+    <Image Include="Assets\Wolf.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

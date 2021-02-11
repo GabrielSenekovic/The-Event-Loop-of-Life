@@ -108,28 +108,3 @@ Vector2 Entity::GetPosition()
 }
 
 void Entity::Render(TheEventLoopOfLife& game, Vector2 renderPosition){}
-
-Crow::Crow(const Vector2& dim) :position({ (float)(rand() % (int)dim.x + 1),(float)(rand() % (int)dim.y + 1) }), velocity({ 0,0 })
-{
-}
-
-void Crow::Move(float fElapsedTime, const Vector2& dim)
-{
-	position += velocity * fElapsedTime * 0.01f;
-	if (position.y > dim.y + 1) //Sprite Height is 1
-	{
-		position.y = 0 - 1;
-	}
-	else if (position.y < 0 - 1)
-	{
-		position.y = dim.y + 1;
-	}
-	if (position.x > dim.x + 1)
-	{
-		position.x = 0 - 1;
-	}
-	else if (position.x < 0 - 1)
-	{
-		position.x = dim.x + 1;
-	}
-}

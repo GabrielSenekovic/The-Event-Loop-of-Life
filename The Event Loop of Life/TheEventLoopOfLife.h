@@ -35,16 +35,7 @@ class TheEventLoopOfLife : public olc::PixelGameEngine
 	Grid grid;
 
 	olc::Decal* tile;
-	olc::Decal* rock;
-	olc::Decal* sheep;
-	olc::Decal* sheep_eating;
-	olc::Decal* wolf;
-	olc::Decal* grass;
-	olc::Decal* grass_growing;
-	olc::Decal* wander; //A question mark
-	olc::Decal* pursue; //An exclamation point
-	olc::Decal* breed; //A heart
-	olc::Decal* crow;
+	//olc::Decal* rock; //Rock is here for the A* task. I'm prepared
 
 	HUDElement frameRate;
 	HUDElement amountOfTurns;

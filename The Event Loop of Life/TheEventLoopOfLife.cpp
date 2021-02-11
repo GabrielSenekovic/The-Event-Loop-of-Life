@@ -1,37 +1,18 @@
 #include "TheEventLoopOfLife.h"
 
 TheEventLoopOfLife::TheEventLoopOfLife(IntVector2 dim_in): dim(dim_in),
-sheep(nullptr), tile(nullptr), wolf(nullptr), rock(nullptr)
+tile(nullptr)//, rock(nullptr)
 {
 }
 
 bool TheEventLoopOfLife::OnUserCreate()
 {
 	tile = new Decal(new Sprite("./Assets/Tile.png"));
-	rock = new Decal(new Sprite("./Assets/Rock.png"));
-	sheep = new Decal(new Sprite("./Assets/Sheep.png"));
-	sheep_eating = new Decal(new Sprite("./Assets/Sheep_Eating.png"));
-	wolf = new Decal(new Sprite("./Assets/Wolf.png"));
-	grass = new Decal(new Sprite("./Assets/Grass.png"));
-	grass_growing = new Decal(new Sprite("./Assets/Grass_Growing.png"));
-	wander = new Decal(new Sprite("./Assets/Spotted.png"));
-	pursue = new Decal(new Sprite("./Assets/Discovered.png"));
-	breed = new Decal(new Sprite("./Assets/Breed.png"));
-	crow = new Decal(new Sprite("./Assets/Crow.png"));
+	//rock = new Decal(new Sprite("./Assets/Rock.png"));
 
 	grid.Initialize(r);
+	entityManager.Initialize(r, grid);
 
-	for (size_t i = 0; i < 50; i++)
-	{
-		Vector2 temp = { -1,-1 };
-		while (temp == Vector2(-1, -1) || grid.tileContent[temp.x + grid.grid.x * temp.y][2] != nullptr || grid.tileTraversibility[temp.x + grid.grid.x * temp.y] == 2)
-		{
-			temp = { (float)(r.myRand() % grid.grid.x) ,(float)(r.myRand() % grid.grid.y) };
-		}
-		Grass* temp_grass = new Grass(temp, { (r.myRand() % 5) + 2.0f, 6.0f }, {grass, grass_growing});
-		entityManager.Add(temp_grass);
-		grid.tileContent[temp.x + grid.grid.x * temp.y][2] = temp_grass;
-	}
 	for (unsigned int i = 0; i < 10; i++)
 	{
 		uint8_t width = 8;
@@ -44,20 +25,6 @@ bool TheEventLoopOfLife::OnUserCreate()
 	amountOfGrass = HUDElement(Word("GRASS", 10, 100), Number(0000, 10 + 8 * 10, 100, 1, 4, digits));
 	amountOfSheep = HUDElement(Word("SHEEP", 10, 110), Number(0000, 10 + 8 * 10, 110, 1, 4, digits));
 	amountOfWolves = HUDElement(Word("WOLVES", 10, 120), Number(0000, 10 + 8 * 10, 120, 1, 4, digits));
-
-	for (size_t i = 0; i < 10; i++)
-	{
-		Sheep* temp_sheep = new Sheep({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, {sheep, sheep_eating, wander, pursue, breed});
-		entityManager.Add(temp_sheep);
-		grid.PlaceEntityOnGrid(temp_sheep);
-		Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, { wolf, wander, pursue, breed });
-		entityManager.Add(temp_wolf);
-		grid.PlaceEntityOnGrid(temp_wolf);
-	}
-	for (int i = 0; i < 50; i++)
-	{
-		entityManager.crows.push_back(Crow(grid.grid));
-	}
 
 	return true;
 }
@@ -114,13 +81,16 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 
 void TheEventLoopOfLife::OnUserDraw()
 {
+	//Refactor this
 	vi2d centering = { grid.grid.x * tile->sprite->width / 2, grid.grid.y * tile->sprite->height / 2 };
 	for (size_t i = 0; i < grid.grid.x * grid.grid.y; i++)
 	{
 		int x = i % grid.grid.x; int y = i / grid.grid.y;
 		vi2d position = { tile->Width() * x + dim.x / 2 - centering.x, tile->Height() * y + dim.y / 2 - centering.y };
 		bool hasGrass = grid.tileContent[i][2] != nullptr;
-		Pixel color = hasGrass || grid.tileTraversibility[i] == 2 ? grid.tileColors[i] : Pixel( 40, 30, 20 );
+		
+		//Pixel color = hasGrass || grid.tileTraversibility[i] == 2 ? grid.tileColors[i] : Pixel( 40, 30, 20 );
+		Pixel color = hasGrass ? grid.tileColors[i] : Pixel(40, 30, 20);
 
 		color = grid.tileContent[i][0] != nullptr && grid.tileContent[i][1] != nullptr ? Pixel(255, 0, 255) :
 				grid.tileContent[i][0] != nullptr ? Pixel(255, 0, 0) :
@@ -128,19 +98,11 @@ void TheEventLoopOfLife::OnUserDraw()
 				color;
 
 		DrawDecal(position, tile, { 1,1 }, color);
-		if (grid.tileTraversibility[i] == 2)
+		/*if (grid.tileTraversibility[i] == 2)
 		{
 			DrawDecal(position, rock, { 1,1 }, color);
-		}
-		if (hasGrass)
-		{
-			switch (dynamic_cast<Grass*>(grid.tileContent[i][2])->maturity)
-			{
-				case Grass::Maturity::GROWING:	DrawDecal(position, grass_growing, { 1,1 }, color); break;
-				case Grass::Maturity::MATURE: DrawDecal(position, grass, { 1,1 }, color); break;
-				case Grass::Maturity::WITHERING: DrawDecal(position, grass, { 1,1 }, Pixel(158, 124, 66)); break;
-			}
-		}
+		}*/
+		if (hasGrass){dynamic_cast<Grass*>(grid.tileContent[i][2])->Render(*this, position, color);}
 	}
 	for (size_t i = 0; i < entityManager.Size(); i++)
 	{
@@ -153,7 +115,7 @@ void TheEventLoopOfLife::OnUserDraw()
 	for (size_t i = 0; i < entityManager.crows.size(); i++)
 	{
 		Vector2 position = { tile->Width() * entityManager.crows[i].position.x + dim.x / 2 - centering.x, tile->Height() * entityManager.crows[i].position.y + dim.y / 2 - centering.y };
-		DrawRotatedDecal(position, crow, entityManager.crows[i].angle, { (float)crow->sprite->width/2,(float)crow->sprite->height/2 }, { 1,1 }, olc::WHITE);
+		entityManager.crows[i].Render(*this, entityManager.crow, position);
 	}
 	frameRate.Render(*this);
 	amountOfTurns.Render(*this);
@@ -165,11 +127,8 @@ void TheEventLoopOfLife::OnUserDraw()
 void TheEventLoopOfLife::Quit()
 {
 	DEL(tile);
-	DEL(rock);
-	DEL(sheep);
-	DEL(wolf);
-	DEL(grass);
-	DEL(grass_growing);
+	//DEL(rock);
+	
 	for (int i = 0; i < grid.tileContent.size(); i++)
 	{
 		DEL(grid.tileContent[i][0]);
