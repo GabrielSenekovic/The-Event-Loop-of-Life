@@ -40,7 +40,7 @@ void Grass::Sense(const Grid& grid, const EntityManager& entityManager)
 	}
 }
 
-void Grass::Decide(Random& r, const IntVector2& dim)
+void Grass::Decide(Random& r, const Grid& grid)
 {
 	//Should I spread to an adjacent square, or should I grow?
 	if (health.x <= 0)
@@ -62,7 +62,7 @@ void Grass::Act(Random& r, Grid& grid, const float& deltaTime, const float& time
 		Vector2 whereToGrow = { -1,-1 };
 		if (whereToGrow == Vector2{ -1, -1 })
 		{
-			whereToGrow = GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, EntityType::GRASS);
+			whereToGrow = GetRandomAdjacentPosition(r, grid, EntityType::GRASS);
 			if (whereToGrow == Vector2{ -1,-1 }) { return; }
 			else
 			{

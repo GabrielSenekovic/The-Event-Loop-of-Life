@@ -49,7 +49,7 @@ bool TheEventLoopOfLife::OnUserUpdate(float fElapsedTime)
 		if (timer == 0)
 		{
 			entityManager.GetEntity(i)->Sense(grid, entityManager);
-			entityManager.GetEntity(i)->Decide(r, grid.grid);
+			entityManager.GetEntity(i)->Decide(r, grid);
 		}
 		entityManager.GetEntity(i)->Act(r, grid, fElapsedTime, timeSpeed, entityManager);
 		if (entityManager.GetEntity(i)->dead)

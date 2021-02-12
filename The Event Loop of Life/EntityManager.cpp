@@ -15,6 +15,7 @@ void EntityManager::Initialize(Random& r, Grid& grid)
 	pursue = new Decal(new Sprite("./Assets/Discovered.png"));
 	breed = new Decal(new Sprite("./Assets/Breed.png"));
 	crow = new Decal(new Sprite("./Assets/Crow.png"));
+	eat = new Decal(new Sprite("./Assets/Eat.png"));
 
 	for (size_t i = 0; i < 50; i++)
 	{
@@ -32,7 +33,7 @@ void EntityManager::Initialize(Random& r, Grid& grid)
 		Sheep* temp_sheep = new Sheep({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 20, { sheep, sheep_eating, wander, pursue, breed });
 		Add(temp_sheep);
 		grid.PlaceEntityOnGrid(temp_sheep);
-		Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 50, { wolf, wander, pursue, breed });
+		Wolf* temp_wolf = new Wolf({ (float)(r.myRand() % grid.grid.x), (float)(r.myRand() % grid.grid.y) }, 50, { wolf, wander, pursue, breed, eat });
 		Add(temp_wolf);
 		grid.PlaceEntityOnGrid(temp_wolf);
 	}
@@ -53,6 +54,7 @@ void EntityManager::Quit()
 	DEL(grass);
 	DEL(grass_growing);
 	DEL(crow);
+	DEL(eat);
 }
 
 void EntityManager::Add(Entity* entity)

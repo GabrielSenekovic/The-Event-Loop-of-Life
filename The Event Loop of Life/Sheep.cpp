@@ -15,7 +15,7 @@ void Sheep::Sense(const Grid& grid, const EntityManager& entityManager)
 	}
 	//Check if there are wolves too close. If there are, take several more wolves in a range into account.
 	int32_t index = position.x + grid.grid.x * position.y;
-	int* constraints = getValidConstraints(index, grid.grid);
+	int* constraints = grid.GetValidConstraints(index);
 	targets.clear();
 	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
@@ -28,7 +28,7 @@ void Sheep::Sense(const Grid& grid, const EntityManager& entityManager)
 		}
 	}
 	delete constraints;
-	constraints = getValidConstraints(index, 2, grid.grid);
+	constraints = grid.GetValidConstraints(index, 2);
 	threats.clear();
 	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
@@ -41,7 +41,7 @@ void Sheep::Sense(const Grid& grid, const EntityManager& entityManager)
 	delete constraints;
 }
 
-void Sheep::Decide(Random& r, const IntVector2& dim)
+void Sheep::Decide(Random& r, const Grid& grid)
 {
 	if (health.x <= 0) 
 	{ 
@@ -53,8 +53,8 @@ void Sheep::Decide(Random& r, const IntVector2& dim)
 	{
 		state = EntityState::EVADE;
 		renderState = EntityState::EVADE;
-		int32_t index = position.x + dim.x * position.y;
-		int* constraints = getValidConstraints(index, dim);
+		int32_t index = position.x + grid.grid.x * position.y;
+		int* constraints = grid.GetValidConstraints(index);
 		float lastDistance = 0;
 		for (int y = constraints[3]; y < constraints[5]; y++)
 		{
@@ -104,7 +104,7 @@ void Sheep::Act(Random& r, Grid& grid, const float& deltaTime, const float& time
 	{
 		case EntityState::BREED:
 		{
-			Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, EntityType::SHEEP);
+			Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, grid, EntityType::SHEEP);
 			if (breedingPlace == Vector2{ -1,-1 }) { return; }
 			else
 			{

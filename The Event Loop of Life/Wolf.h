@@ -12,7 +12,7 @@ public:
 	uint32_t target_handle; //handle
 	Entity* target;
 	void Sense(const Grid& grid, const EntityManager& entityManager) override;
-	void Decide(Random& r, const IntVector2& dim) override;
+	void Decide(Random& r, const Grid& grid) override;
 	void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, EntityManager& entities) override;
 
 	void Render(TheEventLoopOfLife& game, Vector2 position) override;

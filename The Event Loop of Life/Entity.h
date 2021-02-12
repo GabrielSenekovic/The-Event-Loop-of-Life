@@ -45,14 +45,11 @@ public:
 	uint32_t handle;
 	bool dead; //flag for program to delete the entity
 
-	int* getValidConstraints(int i, olc::vi2d grid);
-	int* getValidConstraints(int i, int range, olc::vi2d grid);
-
-	Vector2 GetRandomAdjacentPosition(Random& r, const IntVector2& dim);
-	Vector2 GetRandomAdjacentPosition(Random& r, const IntVector2& dim, const std::vector<std::array<Entity*, 3>>& tileContent, const EntityType& type);
+	Vector2 GetRandomAdjacentPosition(Random& r, const Grid& grid);
+	Vector2 GetRandomAdjacentPosition(Random& r, const Grid& grid, const EntityType& type);
 
 	virtual void Sense(const Grid& grid, const EntityManager& entityManager);
-	virtual void Decide(Random& r, const IntVector2& dim);
+	virtual void Decide(Random& r, const Grid& grid);
 	virtual void Act(Random& r, Grid& grid, const float& deltaTime, const float& timeSpeed, EntityManager& entities);
 
 	virtual Vector2 GetPosition();

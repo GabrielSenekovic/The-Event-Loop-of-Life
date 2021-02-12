@@ -14,7 +14,7 @@ void Wolf::Sense(const Grid& grid, const EntityManager& entityManager)
 	if (target == nullptr)
 	{
 		int32_t index = position.x + grid.grid.x * position.y;
-		int* constraints = getValidConstraints(index, 2, grid.grid);
+		int* constraints = grid.GetValidConstraints(index, 2);
 		targets.clear();
 		for (int y = constraints[3]; y < constraints[5]; y++)
 		{
@@ -31,8 +31,9 @@ void Wolf::Sense(const Grid& grid, const EntityManager& entityManager)
 	}
 }
 
-void Wolf::Decide(Random& r, const IntVector2& dim)
+void Wolf::Decide(Random& r, const Grid& grid)
 {
+	renderState = EntityState::WANDER;
 	if (health.x <= 0)
 	{
 		state = EntityState::DEATH;
@@ -60,7 +61,6 @@ void Wolf::Decide(Random& r, const IntVector2& dim)
 	else
 	{
 		state = EntityState::WANDER;
-		renderState = EntityState::WANDER;
 	}
 }
 
@@ -70,7 +70,7 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 	{
 	case EntityState::BREED:
 	{
-		Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, EntityType::WOLF);
+		Vector2 breedingPlace = Entity::GetRandomAdjacentPosition(r, grid, EntityType::WOLF);
 		if (breedingPlace == Vector2{ -1,-1 }) { return; }
 		else
 		{
@@ -83,11 +83,12 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 	case EntityState::EAT:
 	{
 		int placementOfPrey = spaceOccupying == 0 ? 1 : 0;
-		if (grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey] != nullptr)
+		int index = position.x + grid.grid.x * position.y;
+		if (grid.tileContent[index][placementOfPrey] != nullptr && grid.tileContent[index][placementOfPrey]->entityType == EntityType::SHEEP)
 		{
 			health.x += 5;
-			grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey]->health.x = 0;
-			dynamic_cast<Animal*>(grid.tileContent[position.x + grid.grid.x * position.y][placementOfPrey])->Die(); 
+			grid.tileContent[index][placementOfPrey]->health.x = 0;
+			dynamic_cast<Animal*>(grid.tileContent[index][placementOfPrey])->Die(); 
 			//This is ok since only animals can occupy position 0 and 1
 			state = EntityState::IDLE;
 			target = nullptr;
@@ -95,6 +96,7 @@ void Wolf::Act(Random& r, Grid& grid, const float& deltaTime, const float& timeS
 		}
 		state = EntityState::PURSUE;
 	}
+	[[fallthrough]];
 	case EntityState::PURSUE:
 	{
 		if (destination == Vector2{ -1, -1 } && target != nullptr && target->position != Vector2{ -1,-1 })
@@ -144,6 +146,7 @@ void Wolf::Render(TheEventLoopOfLife& game, Vector2 renderPosition)
 		case EntityState::EAT:
 		{
 			game.DrawDecal(renderPosition, sprites[0], { 1,1 }, olc::WHITE);
+			game.DrawDecal(emotePosition, sprites[4], { 1,1 }, olc::WHITE);
 			break;
 		}
 		case EntityState::BREED:

@@ -7,10 +7,10 @@ Animal::Animal(const Vector2& position_in, const Vector2& health_in, const std::
 {
 }
 
-Vector2 Animal::GetRandomAdjacentPosition(Random& r, const IntVector2& dim, const int& range, const std::vector<std::array<Entity*, 3>>& tileContent, const EntityType& type)
+Vector2 Animal::GetRandomAdjacentPosition(Random& r, const Grid& grid, const int& range, const EntityType& type)
 {
-	int32_t index = position.x + dim.x * position.y;
-	int* constraints = getValidConstraints(index, range, dim);
+	int32_t index = position.x + grid.grid.x * position.y;
+	int* constraints = grid.GetValidConstraints(index, range);
 	std::vector<Vector2> possiblePositions = {};
 	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
@@ -18,14 +18,14 @@ Vector2 Animal::GetRandomAdjacentPosition(Random& r, const IntVector2& dim, cons
 		{
 			if (type == EntityType::SHEEP || type == EntityType::WOLF)
 			{
-				if (position != Vector2(x, y) && (tileContent[x + dim.x * y][0] == nullptr || tileContent[x + dim.x * y][1] == nullptr))
+				if (position != Vector2(x, y) && (grid.tileContent[x + grid.grid.x * y][0] == nullptr || grid.tileContent[x + grid.grid.x * y][1] == nullptr))
 				{
 					possiblePositions.push_back({ (float)x, (float)y });
 				}
 			}
 			else
 			{
-				if (position != Vector2(x, y) && (tileContent[x + dim.x * y][0] == nullptr || tileContent[x + dim.x * y][1] == nullptr) && tileContent[x + dim.x * y][2] == nullptr)
+				if (position != Vector2(x, y) && (grid.tileContent[x + grid.grid.x * y][0] == nullptr || grid.tileContent[x + grid.grid.x * y][1] == nullptr) && grid.tileContent[x + grid.grid.x * y][2] == nullptr)
 				{
 					possiblePositions.push_back({ (float)x, (float)y });
 				}
@@ -71,7 +71,7 @@ void Animal::Wander(Random& r, Grid& grid, const float& deltaTime, const float& 
 {
 	if (destination == Vector2{ -1, -1 })
 	{
-		destination = Entity::GetRandomAdjacentPosition(r, grid.grid, grid.tileContent, entityType);
+		destination = Entity::GetRandomAdjacentPosition(r, grid, entityType);
 		if (destination == Vector2{ -1,-1 }) { return; }
 		else
 		{

@@ -70,3 +70,36 @@ int Grid::GetTileIndexOfEntity(const int& x, const int& y, const Entity::EntityT
 	}
 	return -1;
 }
+int* Grid::GetValidConstraints(int i) const
+{
+	int targY = (i / grid.x);
+	int startY = (targY - 1) % grid.y; //! POS - 1 
+	int targX = i % grid.x;
+	if (startY < 0) { startY = 0; }
+	int startX = (targX - 1) % grid.x; //! POS - 1
+	if (startX < 0) { startX = 0; }
+	int yLimit = targY + 2;
+	int xLimit = targX + 2;
+
+	if (xLimit > grid.x) { xLimit = grid.x; }
+	if (yLimit > grid.y) { yLimit = grid.y; }
+
+	return new int[6]{ targX, targY, startX, startY, xLimit, yLimit };
+}
+
+int* Grid::GetValidConstraints(int i, int range) const
+{
+	int targY = (i / grid.x);
+	int startY = (targY - range) % grid.y; //! POS - 1 
+	int targX = i % grid.x;
+	if (startY < 0) { startY = 0; }
+	int startX = (targX - range) % grid.x; //! POS - 1
+	if (startX < 0) { startX = 0; }
+	int yLimit = targY + range + 1;
+	int xLimit = targX + range + 1;
+
+	if (xLimit > grid.x) { xLimit = grid.x; }
+	if (yLimit > grid.y) { yLimit = grid.y; }
+
+	return new int[6]{ targX, targY, startX, startY, xLimit, yLimit };
+}

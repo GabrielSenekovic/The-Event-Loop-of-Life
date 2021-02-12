@@ -8,44 +8,11 @@ Entity::Entity(const Vector2& position_in, const Vector2& health_in, const std::
 	dead(false), state(EntityState::IDLE), sprites(sprites_in)
 {
 }
-int* Entity::getValidConstraints(int i, olc::vi2d grid)
+
+Vector2 Entity::GetRandomAdjacentPosition(Random& r, const Grid& grid)
 {
-	int targY = (i / grid.x);
-	int startY = (targY - 1) % grid.y; //! POS - 1 
-	int targX = i % grid.x;
-	if (startY < 0) { startY = 0; }
-	int startX = (targX - 1) % grid.x; //! POS - 1
-	if (startX < 0) { startX = 0; }
-	int yLimit = targY + 2;
-	int xLimit = targX + 2;
-
-	if (xLimit > grid.x) { xLimit = grid.x; }
-	if (yLimit > grid.y) { yLimit = grid.y; }
-
-	return new int[6]{ targX, targY, startX, startY, xLimit, yLimit };
-}
-
-int* Entity::getValidConstraints(int i, int range, olc::vi2d grid)
-{
-	int targY = (i / grid.x);
-	int startY = (targY - range) % grid.y; //! POS - 1 
-	int targX = i % grid.x;
-	if (startY < 0) { startY = 0; }
-	int startX = (targX - range) % grid.x; //! POS - 1
-	if (startX < 0) { startX = 0; }
-	int yLimit = targY + range + 1;
-	int xLimit = targX + range + 1;
-
-	if (xLimit > grid.x) { xLimit = grid.x; }
-	if (yLimit > grid.y) { yLimit = grid.y; }
-
-	return new int[6]{ targX, targY, startX, startY, xLimit, yLimit };
-}
-
-Vector2 Entity::GetRandomAdjacentPosition(Random& r, const IntVector2& dim)
-{
-	int32_t index = position.x + dim.x * position.y;
-	int* constraints = getValidConstraints(index, dim);
+	int32_t index = position.x + grid.grid.x * position.y;
+	int* constraints = grid.GetValidConstraints(index);
 	std::vector<Vector2> possiblePositions = {};
 	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
@@ -60,10 +27,10 @@ Vector2 Entity::GetRandomAdjacentPosition(Random& r, const IntVector2& dim)
 	return possiblePositions[r.myRand() % possiblePositions.size()];
 }
 
-Vector2 Entity::GetRandomAdjacentPosition(Random& r, const IntVector2& dim, const std::vector<std::array<Entity*, 3>>& tileContent, const EntityType& type)
+Vector2 Entity::GetRandomAdjacentPosition(Random& r, const Grid& grid, const EntityType& type)
 {
-	int32_t index = position.x + dim.x * position.y;
-	int* constraints = getValidConstraints(index, dim);
+	int32_t index = position.x + grid.grid.x * position.y;
+	int* constraints = grid.GetValidConstraints(index);
 	std::vector<Vector2> possiblePositions = {};
 	for (int y = constraints[3]; y < constraints[5]; y++)
 	{
@@ -71,14 +38,14 @@ Vector2 Entity::GetRandomAdjacentPosition(Random& r, const IntVector2& dim, cons
 		{
 			if (type == EntityType::SHEEP || type == EntityType::WOLF)
 			{
-				if (position != Vector2(x, y) && (tileContent[x + dim.x * y][0] == nullptr || tileContent[x + dim.x * y][1] == nullptr))
+				if (position != Vector2(x, y) && (grid.tileContent[x + grid.grid.x * y][0] == nullptr || grid.tileContent[x + grid.grid.x * y][1] == nullptr))
 				{
 					possiblePositions.push_back({ (float)x, (float)y });
 				}
 			}
 			else
 			{
-				if (position != Vector2(x, y) && (tileContent[x + dim.x * y][0] == nullptr || tileContent[x + dim.x * y][1] == nullptr) && tileContent[x + dim.x * y][2] == nullptr)
+				if (position != Vector2(x, y) && (grid.tileContent[x + grid.grid.x * y][0] == nullptr || grid.tileContent[x + grid.grid.x * y][1] == nullptr) && grid.tileContent[x + grid.grid.x * y][2] == nullptr)
 				{
 					possiblePositions.push_back({ (float)x, (float)y });
 				}
@@ -94,7 +61,7 @@ void Entity::Sense(const Grid& grid, const EntityManager& entityManager)
 {
 }
 
-void Entity::Decide(Random& r, const IntVector2& dim)
+void Entity::Decide(Random& r, const Grid& grid)
 {
 }
 

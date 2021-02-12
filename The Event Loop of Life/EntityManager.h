@@ -23,6 +23,7 @@ class EntityManager
 	olc::Decal* wander; //A question mark
 	olc::Decal* pursue; //An exclamation point
 	olc::Decal* breed; //A heart
+	olc::Decal* eat; //A jaw
 public:
 	olc::Decal* crow;
 
