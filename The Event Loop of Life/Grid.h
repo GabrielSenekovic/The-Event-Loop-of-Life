@@ -23,9 +23,9 @@ public:
 
 	void ClampPositionToGrid(Vector2& vector);
 
-	int GetTileIndexOfEntity(const int& x, const int& y, const Entity::EntityType& entity) const;
-	int* GetValidConstraints(int i) const;
-	int* GetValidConstraints(int i, int range) const;
+	[[nodiscard]] int GetTileIndexOfEntity(const int& x, const int& y, const Entity::EntityType& entity) const;
+	[[nodiscard]] int* GetValidConstraints(int i) const;
+	[[nodiscard]] int* GetValidConstraints(int i, int range) const;
 };
 
 #endif

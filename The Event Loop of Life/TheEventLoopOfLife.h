@@ -12,6 +12,7 @@
 
 using namespace olc;
 
+//These are just my standard Macros i copy pasted
 #define TEA(val, comparison, ternary) (val = val == comparison ternary);
 //Ternary Equivalence Assignment
 //x = x==3? 1:2; turns into

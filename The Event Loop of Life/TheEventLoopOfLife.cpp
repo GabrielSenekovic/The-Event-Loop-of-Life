@@ -92,10 +92,10 @@ void TheEventLoopOfLife::OnUserDraw()
 		//Pixel color = hasGrass || grid.tileTraversibility[i] == 2 ? grid.tileColors[i] : Pixel( 40, 30, 20 );
 		Pixel color = hasGrass ? grid.tileColors[i] : Pixel(40, 30, 20);
 
-		color = grid.tileContent[i][0] != nullptr && grid.tileContent[i][1] != nullptr ? Pixel(255, 0, 255) :
+		/*color = grid.tileContent[i][0] != nullptr && grid.tileContent[i][1] != nullptr ? Pixel(255, 0, 255) :
 				grid.tileContent[i][0] != nullptr ? Pixel(255, 0, 0) :
 				grid.tileContent[i][1] != nullptr ? Pixel(0, 0, 255) :
-				color;
+				color;*/ //Debugging tool to see what tiles are currently occupied
 
 		DrawDecal(position, tile, { 1,1 }, color);
 		/*if (grid.tileTraversibility[i] == 2)
